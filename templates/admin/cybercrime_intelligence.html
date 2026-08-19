@@ -1,0 +1,244 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Cybercrime Intelligence{% endblock %}
+
+{% block page_title %}Cybercrime Intelligence Integration{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="text-center mb-5">
+            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; color: var(--heading-text);">Cybercrime Intelligence</h1>
+            <p style="color: var(--muted-text); font-size: 1.1rem;">Detect phishing, scams, identity theft, and other cyber threats</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <form id="cybercrimeForm" class="cyber-form">
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Instagram Username</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-at" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="text" id="username" name="username" required placeholder="@crypto_profit_daily" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Profile Bio</label>
+                            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                                <i class="bi bi-file-text" style="color: var(--primary-blue); font-size: 1.2rem; margin-top: 12px;"></i>
+                                <textarea id="bio" name="bio" rows="3" placeholder="Enter profile bio..." class="light-input" style="flex: 1;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Recent Post Captions (one per line)</label>
+                            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                                <i class="bi bi-chat-quote" style="color: var(--primary-blue); font-size: 1.2rem; margin-top: 12px;"></i>
+                                <textarea id="captions" name="captions" rows="4" placeholder="Enter post captions..." class="light-input" style="flex: 1;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Links in Profile/Posts (one per line)</label>
+                            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                                <i class="bi bi-link-45deg" style="color: var(--primary-blue); font-size: 1.2rem; margin-top: 12px;"></i>
+                                <textarea id="links" name="links" rows="3" placeholder="https://..." class="light-input" style="flex: 1;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+                            <i class="bi bi-shield-exclamation"></i> Analyze Cyber Threats
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsSection" class="row justify-content-center d-none">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <h3 class="text-center mb-4" style="font-weight: 700;">Cybercrime Intelligence Report</h3>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="cyber-card" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3);">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Instagram Profile</h6>
+                            <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue);" id="resUsername"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="cyber-card" style="border: 3px solid;" id="riskCard">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Threat Level</h6>
+                            <div class="text-center">
+                                <h1 id="resThreatScore" style="font-size: 3rem; font-weight: 900;"></h1>
+                                <h4 id="resThreatLevel" style="font-weight: 700;"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-3">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Phishing</h6>
+                            <div class="text-center">
+                                <h2 id="resPhishing" style="font-weight: 800; color: #dc2626;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Financial Scam</h6>
+                            <div class="text-center">
+                                <h2 id="resFinancial" style="font-weight: 800; color: #ef4444;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Identity Theft</h6>
+                            <div class="text-center">
+                                <h2 id="resIdentity" style="font-weight: 800; color: #f97316;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Malware</h6>
+                            <div class="text-center">
+                                <h2 id="resMalware" style="font-weight: 800; color: #eab308;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">AI Confidence</h6>
+                            <p id="resConfidence" style="font-size: 2rem; font-weight: 800; text-align: center;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Recommended Action</h6>
+                            <p id="resRecommended" style="font-size: 1.1rem; font-weight: 600;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-card mb-4">
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Detected Threats</h5>
+                    <ul id="resThreats" class="list-unstyled"></ul>
+                </div>
+
+                <div class="cyber-card mb-4">
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Threat Categories</h5>
+                    <div id="resCategories" class="d-flex flex-wrap gap-2"></div>
+                </div>
+
+                <div class="text-center">
+                    <h4 id="resFinalResult" style="font-weight: 700;"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('cybercrimeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Analyzing...';
+
+    try {
+        const formData = new FormData(this);
+        const response = await fetch('/api/analyze-cybercrime', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            displayResults(data.report);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error analyzing profile');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-exclamation"></i> Analyze Cyber Threats';
+    }
+});
+
+function displayResults(report) {
+    document.getElementById('resultsSection').classList.remove('d-none');
+
+    document.getElementById('resUsername').textContent = report.username;
+    document.getElementById('resThreatScore').textContent = report.threat_intelligence_score + '%';
+    document.getElementById('resThreatScore').style.color = report.risk_color;
+    document.getElementById('resThreatLevel').textContent = report.threat_level;
+    document.getElementById('riskCard').style.borderColor = report.risk_color;
+
+    document.getElementById('resPhishing').textContent = report.phishing_score;
+    document.getElementById('resFinancial').textContent = report.financial_scam_score;
+    document.getElementById('resIdentity').textContent = report.identity_theft_score;
+    document.getElementById('resMalware').textContent = report.malware_score;
+
+    document.getElementById('resConfidence').textContent = report.ai_confidence_score + '%';
+    document.getElementById('resRecommended').textContent = report.recommended_action;
+
+    const threatsList = document.getElementById('resThreats');
+    threatsList.innerHTML = '';
+    if (report.detected_threats.length > 0) {
+        report.detected_threats.forEach(threat => {
+            const li = document.createElement('li');
+            li.className = 'mb-2';
+            li.innerHTML = '<i class="bi bi-check-circle text-danger me-2"></i>' + threat;
+            threatsList.appendChild(li);
+        });
+    } else {
+        const li = document.createElement('li');
+        li.innerHTML = '<i class="bi bi-check-circle text-success me-2"></i>No threats detected';
+        threatsList.appendChild(li);
+    }
+
+    const categoriesDiv = document.getElementById('resCategories');
+    categoriesDiv.innerHTML = '';
+    if (report.threat_categories.length > 0) {
+        report.threat_categories.forEach(cat => {
+            const span = document.createElement('span');
+            span.className = 'badge bg-danger';
+            span.textContent = cat;
+            categoriesDiv.appendChild(span);
+        });
+    } else {
+        const span = document.createElement('span');
+        span.className = 'badge bg-success';
+        span.textContent = 'No Threat Categories';
+        categoriesDiv.appendChild(span);
+    }
+
+    document.getElementById('resFinalResult').textContent = report.final_result;
+    document.getElementById('resFinalResult').style.color = report.risk_color;
+
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

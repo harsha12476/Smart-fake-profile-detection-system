@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detect Fake Profile - Fake Profile Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-shield-lock"></i> Fake Profile Detector
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('detect') }}">Detect</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('history') }}">History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="fw-bold">Fake Profile Detection</h1>
+                    <p class="lead text-muted">Enter the profile details below to check if it's fake or real</p>
+                </div>
+
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-5">
+                        <form method="POST" action="{{ url_for('predict') }}">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label for="username" class="form-label fw-bold">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" id="username" name="username" required placeholder="Enter profile username">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="followers" class="form-label fw-bold">Number of Followers</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-people"></i></span>
+                                        <input type="number" class="form-control" id="followers" name="followers" required min="0" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="following" class="form-label fw-bold">Number Following</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-plus"></i></span>
+                                        <input type="number" class="form-control" id="following" name="following" required min="0" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="posts" class="form-label fw-bold">Number of Posts</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-images"></i></span>
+                                        <input type="number" class="form-control" id="posts" name="posts" required min="0" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="bio_length" class="form-label fw-bold">Bio Length (characters)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-file-text"></i></span>
+                                        <input type="number" class="form-control" id="bio_length" name="bio_length" required min="0" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="account_age_days" class="form-label fw-bold">Account Age (days)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                        <input type="number" class="form-control" id="account_age_days" name="account_age_days" required min="1" placeholder="1">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Has Profile Picture?</label>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" id="has_profile_picture" name="has_profile_picture" value="1">
+                                        <label class="form-check-label" for="has_profile_picture">
+                                            Yes, this account has a profile picture
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-search"></i> Analyze Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-lg mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-info-circle text-primary"></i> Tips for Better Results
+                        </h5>
+                        <ul class="mb-0">
+                            <li>Fake profiles often have few followers but follow many people</li>
+                            <li>Real profiles typically have more posts and a longer bio</li>
+                            <li>Most real accounts have a profile picture</li>
+                            <li>New accounts (less than 30 days old) are more likely to be fake</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Smart Fake Profile Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</body>
+</html>

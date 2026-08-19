@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="{{ g.current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FPDS - Smart Fake Profile Detection System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/light-theme.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-logo">
+                <i class="bi bi-shield-lock"></i>
+                {{ g.t('FPDS') }}
+            </div>
+            <div class="navbar-center">
+                {% if 'logged_in' in session %}
+                    <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">{{ g.t('Dashboard') }}</a>
+                    <a href="{{ url_for('detect') }}" class="{% if request.endpoint == 'detect' %}active{% endif %}">{{ g.t('Detect') }}</a>
+                    <a href="{{ url_for('history') }}" class="{% if request.endpoint == 'history' %}active{% endif %}">{{ g.t('History') }}</a>
+                    <a href="{{ url_for('behavior_analysis') }}" class="{% if request.endpoint == 'behavior_analysis' %}active{% endif %}">{{ g.t('Behavior Analysis') }}</a>
+                    <a href="{{ url_for('network_analysis_page') }}" class="{% if request.endpoint == 'network_analysis_page' %}active{% endif %}"><i class="bi bi-diagram-3"></i> {{ g.t('Network Analysis') }}</a>
+                    <a href="{{ url_for('chatbot_page') }}" class="{% if request.endpoint == 'chatbot_page' %}active{% endif %}"><i class="bi bi-robot"></i> {{ g.t('Chatbot') }}</a>
+                {% elif 'admin_logged_in' in session %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">{{ g.t('Admin Dashboard') }}</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">{{ g.t('Home') }}</a>
+                    <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">{{ g.t('About') }}</a>
+                    <a href="{{ url_for('index') }}#features">{{ g.t('Features') }}</a>
+                    <a href="{{ url_for('how_it_works') }}" class="{% if request.endpoint == 'how_it_works' %}active{% endif %}">{{ g.t('How It Works') }}</a>
+                    <a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">{{ g.t('Contact') }}</a>
+                    <a href="{{ url_for('chatbot_page') }}" class="{% if request.endpoint == 'chatbot_page' %}active{% endif %}"><i class="bi bi-robot"></i> {{ g.t('Chatbot') }}</a>
+                {% endif %}
+            </div>
+            <div class="navbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="language-selector" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-translate" style="font-size: 18px;"></i>
+                    <select id="languageSelect" onchange="window.location.href='/set-language/' + this.value" style="padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: white; cursor: pointer;">
+                        {% for lang_code, lang_name in g.supported_languages.items() %}
+                        <option value="{{ lang_code }}" {% if g.current_lang == lang_code %}selected{% endif %}>{{ lang_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if 'logged_in' in session %}
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="bi bi-house"></i> {{ g.t('Home') }}</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> {{ g.t('Logout') }}</a>
+                {% elif 'admin_logged_in' in session %}
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="bi bi-house"></i> {{ g.t('Home') }}</a>
+                    <a href="{{ url_for('admin_logout') }}" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> {{ g.t('Logout') }}</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">{{ g.t('Login') }}</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">{{ g.t('Register') }}</a>
+                {% endif %}
+            </div>
+            <button class="navbar-toggle">
+                <i class="bi bi-list"></i>
+            </button>
+        </nav>
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+        <footer>
+            <p>{{ g.t('Copyright') }}</p>
+        </footer>
+    </div>
+</body>
+</html>

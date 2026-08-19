@@ -1,0 +1,464 @@
+{% extends "user/user_base.html" %}
+
+{% block title %}Behavioral Analysis{% endblock %}
+
+{% block page_title %}Behavioral Analysis{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">Behavioral Analysis</h1>
+                <p style="color: var(--muted-text); margin: 0;">Monitor activity patterns and suspicious user behavior</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh Analysis
+                </button>
+                <button class="btn btn-primary" id="exportBtn">
+                    <i class="bi bi-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">145</div>
+            <div class="metric-label">Total Logins</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">89</div>
+            <div class="metric-label">Total Posts</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">12</div>
+            <div class="metric-label">Actions per Hour</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">6.5</div>
+            <div class="metric-label">Continuous Hours</div>
+        </div>
+        <div class="metric-card" style="border-color: var(--danger-red);">
+            <div class="metric-value" style="color: var(--danger-red); background: none; -webkit-text-fill-color: var(--danger-red);">42%</div>
+            <div class="metric-label">Suspicion Score</div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="chart-card">
+                <h5 style="font-weight: 700; margin-bottom: 20px; color: var(--heading-text);">Login Frequency Trend</h5>
+                <canvas id="loginChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="chart-card">
+                <h5 style="font-weight: 700; margin-bottom: 20px; color: var(--heading-text);">Activity Distribution</h5>
+                <canvas id="activityChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="chart-card">
+                <h5 style="font-weight: 700; margin-bottom: 20px; color: var(--heading-text);">Suspicion Score Trend</h5>
+                <canvas id="suspicionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-card mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">Detailed Activity Logs</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="cyber-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Logins</th>
+                        <th>Posts</th>
+                        <th>Actions/Hour</th>
+                        <th>Continuous Hours</th>
+                        <th>Suspicion Score</th>
+                        <th>Risk Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-05-12</td>
+                        <td>5</td>
+                        <td>3</td>
+                        <td>8</td>
+                        <td>3.2</td>
+                        <td>15%</td>
+                        <td><span class="risk-badge normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-05-11</td>
+                        <td>12</td>
+                        <td>8</td>
+                        <td>18</td>
+                        <td>5.5</td>
+                        <td>35%</td>
+                        <td><span class="risk-badge warning">Warning</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-05-10</td>
+                        <td>20</td>
+                        <td>15</td>
+                        <td>25</td>
+                        <td>8.0</td>
+                        <td>68%</td>
+                        <td><span class="risk-badge suspicious">Suspicious</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-05-09</td>
+                        <td>4</td>
+                        <td>2</td>
+                        <td>6</td>
+                        <td>2.0</td>
+                        <td>10%</td>
+                        <td><span class="risk-badge normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td>2026-05-08</td>
+                        <td>7</td>
+                        <td>5</td>
+                        <td>10</td>
+                        <td>4.0</td>
+                        <td>22%</td>
+                        <td><span class="risk-badge normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="alertsPanel" style="display: none; margin-bottom: 30px;">
+        <h5 style="margin-bottom: 15px;"><i class="bi bi-bell-fill" style="color: var(--alert-red);"></i> Real-Time Behavioral Alerts</h5>
+        <div id="alertsList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <div class="insights-panel">
+        <h5><i class="bi bi-lightbulb" style="color: var(--primary-blue);"></i> AI-Generated Insights</h5>
+        <div class="insight-item">
+            <i class="bi bi-exclamation-triangle" style="color: var(--warning-amber);"></i>
+            Unusual login spikes detected on May 10th (20 logins vs average 7)
+        </div>
+        <div class="insight-item">
+            <i class="bi bi-bar-chart" style="color: var(--primary-blue);"></i>
+            High posting frequency observed: 15 posts on May 10th
+        </div>
+        <div class="insight-item">
+            <i class="bi bi-clock" style="color: var(--primary-blue);"></i>
+            Suspicious continuous activity of 8 hours detected on May 10th
+        </div>
+    </div>
+
+    <div class="cyber-card mt-5" style="padding: 25px; text-align: center;">
+        <i class="bi bi-info-circle" style="font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 15px;"></i>
+        <h4 style="font-weight: 700; margin-bottom: 10px; color: var(--heading-text);">Automated Behavioral Analysis</h4>
+        <p style="color: var(--muted-text); margin: 0;">This page automatically analyzes user activity data collected by the system and displays suspicious behavioral patterns in real time.</p>
+    </div>
+
+    {% if behavior_result %}
+        <div class="row g-4 mt-5">
+            <div class="col-lg-4">
+                <div class="cyber-card h-100" style="text-align: center; padding: 40px 20px;">
+                    <div class="mb-4">
+                        <h1 style="font-size: 4rem; font-weight: 800; margin: 0; color: {% if behavior_result.risk_level == 'High' %}var(--danger-red){% elif behavior_result.risk_level == 'Medium' %}var(--warning-amber){% else %}var(--success-green){% endif %}">
+                            {{ behavior_result.activity_score }}
+                        </h1>
+                        <p style="color: var(--muted-text); margin: 0;">Activity Score</p>
+                    </div>
+                    <hr style="border-color: var(--border-color); margin: 25px 0;">
+                    <div class="mb-4">
+                        <h2 style="font-size: 2.5rem; font-weight: 800; margin: 0; color: {% if behavior_result.bot_probability >= 70 %}var(--danger-red){% elif behavior_result.bot_probability >= 40 %}var(--warning-amber){% else %}var(--success-green){% endif %}">
+                            {{ behavior_result.bot_probability }}%
+                        </h2>
+                        <p style="color: var(--muted-text); margin: 0;">Bot Probability</p>
+                    </div>
+                    <hr style="border-color: var(--border-color); margin: 25px 0;">
+                    <div class="mb-4">
+                        <span class="badge {% if behavior_result.risk_level == 'High' %}badge-danger{% elif behavior_result.risk_level == 'Medium' %}badge-warning{% else %}badge-success{% endif %}" style="font-size: 1rem; padding: 8px 20px;">
+                            {{ behavior_result.risk_level }} Risk
+                        </span>
+                    </div>
+                    <hr style="border-color: var(--border-color); margin: 25px 0;">
+                    <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">{{ behavior_result.recommendation }}</h5>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="cyber-card h-100">
+                    <h5 style="font-weight: 700; margin-bottom: 25px; color: var(--heading-text);">
+                        <i class="bi bi-exclamation-triangle" style="color: var(--warning-amber);"></i> Suspicious Flags
+                    </h5>
+                    {% if behavior_result.suspicious_flags %}
+                        <div class="row g-2">
+                            {% for flag in behavior_result.suspicious_flags %}
+                                <div class="col-md-6">
+                                    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 10px;">
+                                        <i class="bi bi-exclamation-circle" style="color: var(--warning-amber);"></i>
+                                        <span style="color: var(--body-text);">{{ flag }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-check-circle" style="color: var(--success-green);"></i>
+                            <span style="color: var(--body-text);">No suspicious flags detected</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if behavior_result.detection_indicators %}
+        <div class="cyber-card mt-5">
+            <h5 style="font-weight: 700; margin-bottom: 25px; color: var(--heading-text);">
+                <i class="bi bi-exclamation-diamond" style="color: var(--alert-red);"></i> Fake Profile Detection Indicators
+            </h5>
+            <div class="row g-2">
+                {% for indicator in behavior_result.detection_indicators %}
+                    <div class="col-md-6">
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-exclamation-diamond-fill" style="color: var(--alert-red);"></i>
+                            <span style="color: var(--body-text);">{{ indicator.description }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if combined_result %}
+            <div class="cyber-card mt-5">
+                <div style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); padding: 20px 30px; border-bottom: 1px solid var(--border-color); border-radius: 16px 16px 0 0; margin: -25px -25px 25px -25px;">
+                    <h4 style="font-weight: 700; margin: 0; color: var(--primary-blue);">
+                        <i class="bi bi-merge"></i> Combined Analysis (Profile + Behavior)
+                    </h4>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 text-center">
+                        <div class="cyber-card" style="margin: 0; padding: 30px;">
+                            <h6 style="font-weight: 600; margin-bottom: 15px; color: var(--muted-text);">Combined Bot Probability</h6>
+                            <h1 style="font-size: 3.5rem; font-weight: 800; margin: 0 0 15px 0; color: {% if combined_result.combined_probability >= 70 %}var(--danger-red){% elif combined_result.combined_probability >= 40 %}var(--warning-amber){% else %}var(--success-green){% endif %}">
+                                {{ combined_result.combined_probability }}%
+                            </h1>
+                            <span class="badge {% if combined_result.combined_risk == 'High' %}badge-danger{% elif combined_result.combined_risk == 'Medium' %}badge-warning{% else %}badge-success{% endif %}" style="font-size: 1rem; padding: 8px 20px;">
+                                {{ combined_result.combined_risk }} Risk
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="cyber-card" style="margin: 0; padding: 30px;">
+                            <h6 style="font-weight: 600; margin-bottom: 25px; color: var(--muted-text);">Contribution Breakdown</h6>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span style="color: var(--body-text);">Profile Analysis</span>
+                                    <span style="font-weight: 700; color: var(--body-text);">{{ combined_result.profile_contribution }}%</span>
+                                </div>
+                                <div style="width: 100%; height: 12px; background: rgba(37, 99, 235, 0.1); border-radius: 6px; overflow: hidden;">
+                                    <div style="width: {{ combined_result.profile_contribution }}%; height: 100%; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-cyan) 100%);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span style="color: var(--body-text);">Behavior Analysis</span>
+                                    <span style="font-weight: 700; color: var(--body-text);">{{ combined_result.behavior_contribution }}%</span>
+                                </div>
+                                <div style="width: 100%; height: 12px; background: rgba(37, 99, 235, 0.1); border-radius: 6px; overflow: hidden;">
+                                    <div style="width: {{ combined_result.behavior_contribution }}%; height: 100%; background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let loginChart, activityChart, suspicionChart;
+
+        async function loadBehaviorCharts() {
+            try {
+                const response = await fetch('/api/behavior-trends');
+                const data = await response.json();
+
+                // Login Frequency Trend
+                const loginCtx = document.getElementById('loginChart').getContext('2d');
+                if (loginChart) loginChart.destroy();
+                loginChart = new Chart(loginCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.login.labels,
+                        datasets: [{
+                            label: 'Login Frequency',
+                            data: data.login.values,
+                            borderColor: '#2563EB',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#2563EB',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(37, 99, 235, 0.1)' },
+                                ticks: { color: '#64748B' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(37, 99, 235, 0.1)' },
+                                ticks: { color: '#64748B' }
+                            }
+                        }
+                    }
+                });
+
+                // Activity Distribution
+                const activityCtx = document.getElementById('activityChart').getContext('2d');
+                if (activityChart) activityChart.destroy();
+                activityChart = new Chart(activityCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.activity.labels,
+                        datasets: [{
+                            data: data.activity.values,
+                            backgroundColor: ['#2563EB', '#10B981', '#06B6D4', '#F59E0B', '#6f42c1'],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: {
+                            animateRotate: true,
+                            animateScale: true,
+                            duration: 1000
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#64748B' }
+                            }
+                        }
+                    }
+                });
+
+                // Suspicion Score Trend
+                const suspicionCtx = document.getElementById('suspicionChart').getContext('2d');
+                if (suspicionChart) suspicionChart.destroy();
+                suspicionChart = new Chart(suspicionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.suspicion.labels,
+                        datasets: [{
+                            label: 'Suspicion Score',
+                            data: data.suspicion.values,
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#EF4444',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: 'rgba(37, 99, 235, 0.1)' },
+                                ticks: { color: '#64748B' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(37, 99, 235, 0.1)' },
+                                ticks: { color: '#64748B' }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Chart rendering failed:", error);
+            }
+        }
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadBehaviorCharts();
+        });
+
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            alert('Report export functionality would be implemented here!');
+        });
+
+        async function loadAlerts(analysisResult) {
+            try {
+                const response = await fetch('/api/generate-alerts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(analysisResult)
+                });
+                const data = await response.json();
+                const alertsList = document.getElementById('alertsList');
+                const alertsPanel = document.getElementById('alertsPanel');
+                
+                if (data.alerts && data.alerts.length > 0) {
+                    alertsPanel.style.display = 'block';
+                    alertsList.innerHTML = '';
+                    data.alerts.forEach(alert => {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.style.cssText = `
+                            background: ${alert.severity === 'critical' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'};
+                            border: 1px solid ${alert.severity === 'critical' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(245, 158, 11, 0.25)'};
+                            border-radius: 12px;
+                            padding: 15px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        `;
+                        alertDiv.innerHTML = `
+                            <i class="bi bi-${alert.severity === 'critical' ? 'exclamation-octagon-fill' : 'exclamation-triangle-fill'}" style="color: ${alert.severity === 'critical' ? '#EF4444' : '#F59E0B'};"></i>
+                            <span style="color: var(--body-text);">${alert.message}</span>
+                        `;
+                        alertsList.appendChild(alertDiv);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        // Load charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', loadBehaviorCharts);
+    </script>
+{% endblock %}

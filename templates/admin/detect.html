@@ -1,0 +1,145 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Detect Fake Profile - Admin{% endblock %}
+
+{% block page_title %}Detect Fake Profile{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="text-center mb-5">
+            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; color: var(--heading-text);">Fake Profile Detection</h1>
+            <p style="color: var(--muted-text); font-size: 1.1rem;">Analyze a social media profile using AI and Machine Learning</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <form method="POST" action="{{ url_for('predict') }}" class="cyber-form">
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Username</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-person" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="text" id="username" name="username" required placeholder="Enter profile username" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Number of Followers</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-people" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="followers" name="followers" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Number Following</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-person-plus" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="following" name="following" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Number of Posts</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-images" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="posts" name="posts" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Bio Length (characters)</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-file-text" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="bio_length" name="bio_length" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Account Age (days)</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-calendar" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="account_age_days" name="account_age_days" required min="1" placeholder="1" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Has Profile Picture?</label>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                                <input class="form-check-input" type="checkbox" id="has_profile_picture" name="has_profile_picture" value="1" style="width: 20px; height: 20px; accent-color: var(--primary-blue);">
+                                <label for="has_profile_picture" style="color: var(--body-text); margin: 0;">
+                                    Yes, this account has a profile picture
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+                            <i class="bi bi-search"></i> Analyze Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="cyber-card mt-4">
+                <h5 style="font-weight: 700; margin-bottom: 15px;">
+                    <i class="bi bi-info-circle" style="color: var(--primary-blue);"></i> Tips for Better Results
+                </h5>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="padding: 10px 0; color: var(--muted-text); display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--primary-blue); font-weight: bold;">▸</span>
+                        Fake profiles often have few followers but follow many people
+                    </li>
+                    <li style="padding: 10px 0; color: var(--muted-text); display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--primary-blue); font-weight: bold;">▸</span>
+                        Real profiles typically have more posts and a longer bio
+                    </li>
+                    <li style="padding: 10px 0; color: var(--muted-text); display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--primary-blue); font-weight: bold;">▸</span>
+                        Most real accounts have a profile picture
+                    </li>
+                    <li style="padding: 10px 0; color: var(--muted-text); display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--primary-blue); font-weight: bold;">▸</span>
+                        New accounts (less than 30 days old) are more likely to be fake
+                    </li>
+                </ul>
+            </div>
+
+            <div class="cyber-card mt-4">
+                <h5 style="font-weight: 700; margin-bottom: 15px;">
+                    <i class="bi bi-lightbulb" style="color: var(--success-color);"></i> Additional Security Features
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="{{ url_for('admin_geolocation_dashboard') }}" class="btn btn-outline-warning btn-lg w-100">
+                            <i class="bi bi-geo-alt-fill"></i> Geolocation Risk Analysis
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ url_for('admin_fake_follower_detection') }}" class="btn btn-outline-success btn-lg w-100">
+                            <i class="bi bi-person-x"></i> Fake Follower Marketplace Detection
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ url_for('admin_cybercrime_intelligence') }}" class="btn btn-outline-info btn-lg w-100">
+                            <i class="bi bi-shield-exclamation"></i> Cybercrime Intelligence
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Analyzing...';
+        });
+    </script>
+{% endblock %}

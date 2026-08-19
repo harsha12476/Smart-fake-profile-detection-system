@@ -1,0 +1,62 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: te\n"
+
+msgid "Home"
+msgstr "హోమ్"
+
+msgid "About"
+msgstr "గురించి"
+
+msgid "Features"
+msgstr "లక్షణాలు"
+
+msgid "How It Works"
+msgstr "ఇది ఎలా పనిచేస్తుంది"
+
+msgid "Contact"
+msgstr "సంప్రదించండి"
+
+msgid "Login"
+msgstr "లాగిన్"
+
+msgid "Register"
+msgstr "నమోదించండి"
+
+msgid "Dashboard"
+msgstr "డాష్బోర్డ్"
+
+msgid "Detect"
+msgstr "గుర్తించండి"
+
+msgid "History"
+msgstr "చరిత్ర"
+
+msgid "Behavior Analysis"
+msgstr "ప్రవర్తన విశ్లేషణ"
+
+msgid "Network Analysis"
+msgstr "నెట్వర్క్ విశ్లేషణ"
+
+msgid "Chatbot"
+msgstr "చాట్బాట్"
+
+msgid "Admin Dashboard"
+msgstr "అడ్మిన్ డాష్బోర్డ్"
+
+msgid "Logout"
+msgstr "లాగ్ఔట్"
+
+msgid "FPDS"
+msgstr "FPDS"
+
+msgid "Smart Fake Profile Detection System"
+msgstr "స్మార్ట్ ఫేక్ ప్రొఫైల్ డిటెక్షన్ సిస్టమ్"
+
+msgid "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+msgstr "&copy; 2026 స్మార్ట్ ఫేక్ ప్రొఫైల్ డిటెక్షన్ సిస్టమ్. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి."
+
+msgid "Language"
+msgstr "భాష"

@@ -1,0 +1,182 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Social Graph Analytics - FPDS Admin{% endblock %}
+
+{% block page_title %}Social Graph Intelligence{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">
+                <i class="bi bi-diagram-3-fill"></i> Social Graph Analytics
+            </h1>
+            <p style="color: var(--muted-text); margin: 0;">Enterprise-level social network threat analysis</p>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid mb-4">
+    <div class="cyber-card" style="border-left:4px solid var(--primary-blue);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px;height:60px;background:rgba(37,99,235,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:15px;">
+                <i class="bi bi-people" style="font-size:1.8rem;color:var(--primary-blue);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem;font-weight:800;margin:0;color:var(--heading-text);">{{ total_profiles }}</h3>
+                <small style="color:var(--muted-text);">Total Connected Profiles</small>
+            </div>
+        </div>
+    </div>
+    <div class="cyber-card" style="border-left:4px solid var(--danger-red);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px;height:60px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:15px;">
+                <i class="bi bi-exclamation-octagon" style="font-size:1.8rem;color:var(--danger-red);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem;font-weight:800;margin:0;color:var(--heading-text);">{{ high_risk }}</h3>
+                <small style="color:var(--muted-text);">High-Risk Accounts</small>
+            </div>
+        </div>
+    </div>
+    <div class="cyber-card" style="border-left:4px solid var(--warning-amber);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px;height:60px;background:rgba(234,179,8,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:15px;">
+                <i class="bi bi-boxes" style="font-size:1.8rem;color:var(--warning-amber);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem;font-weight:800;margin:0;color:var(--heading-text);">{{ total_clusters }}</h3>
+                <small style="color:var(--muted-text);">Bot Clusters Detected</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="row g-4">
+    <!-- Interactive Graph -->
+    <div class="col-lg-8">
+        <div class="cyber-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 style="font-weight:700;margin:0;color:var(--heading-text);">
+                    <i class="bi bi-share-nodes"></i> Global Network Visualization
+                </h5>
+            </div>
+            <div id="adminGraphContainer" style="width:100%;height:450px;background:white;border-radius:10px;border:1px solid var(--border-color);"></div>
+        </div>
+    </div>
+    
+    <!-- Bot Clusters List -->
+    <div class="col-lg-4">
+        <div class="cyber-card h-100">
+            <h5 style="font-weight:700;margin-bottom:20px;color:var(--heading-text);">
+                <i class="bi bi-robot"></i> Bot Clusters Detected
+            </h5>
+            <div id="clustersContainer">
+                {% if clusters %}
+                    {% for cluster in clusters %}
+                        <div class="mb-3 p-3 rounded" style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 style="font-weight:700;margin:0;">
+                                    <i class="bi bi-box"></i> Cluster #{{ cluster.cluster_id }}
+                                </h6>
+                                <span class="badge badge-danger" style="font-size:0.85rem;">{{ cluster.threat_level }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Size:</strong> {{ cluster.size }} accounts
+                            </div>
+                            <div class="mb-2">
+                                <strong>Risk Score:</strong> {{ cluster.risk_score }}%
+                            </div>
+                            <div>
+                                <strong>Members:</strong>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    {% for member in cluster.members %}
+                                        <span class="badge bg-secondary" style="font-size:0.75rem;">{{ member }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="bi bi-check-circle" style="font-size:3rem;color:var(--success-green);opacity:0.5;"></i>
+                        <p class="mt-2 text-muted">No bot clusters detected</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadAdminGraph();
+});
+
+async function loadAdminGraph() {
+    try {
+        const response = await fetch('/api/social-graph/data');
+        const result = await response.json();
+        
+        if (result.success) {
+            drawAdminGraph(result.graph);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function drawAdminGraph(graphData) {
+    const container = document.getElementById('adminGraphContainer');
+    
+    const nodesArray = graphData.nodes.map(node => ({
+        id: node.id,
+        label: node.label,
+        color: node.color,
+        shape: 'dot',
+        size: Math.max(10, 25 - node.risk / 5),
+        font: { size: 16, color: '#0f172a' },
+        shadow: true
+    }));
+    
+    const edgesArray = graphData.edges.map(edge => ({
+        from: edge.from,
+        to: edge.to,
+        width: edge.weight,
+        color: { color: '#cbd5e1', highlight: '#2563eb' },
+        smooth: { type: 'continuous' }
+    }));
+    
+    const nodesDataSet = new vis.DataSet(nodesArray);
+    const edgesDataSet = new vis.DataSet(edgesArray);
+    
+    const data = { nodes: nodesDataSet, edges: edgesDataSet };
+    
+    const options = {
+        nodes: { borderWidth: 2, borderWidthSelected:4 },
+        edges: { smooth: true },
+        physics: {
+            enabled: true,
+            barnesHut: {
+                gravitationalConstant: -4000,
+                centralGravity: 0.3,
+                springLength: 180,
+                springConstant: 0.05
+            }
+        },
+        interaction: { hover: true }
+    };
+    
+    const network = new vis.Network(container, data, options);
+}
+</script>
+{% endblock %}

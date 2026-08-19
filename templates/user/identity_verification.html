@@ -1,0 +1,87 @@
+{% extends "user/user_base.html" %}
+
+{% block title %}Blockchain Identity Verification - FPDS{% endblock %}
+
+{% block page_title %}Blockchain Identity Verification{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">
+                <i class="bi bi-shield-lock"></i> Blockchain Identity Verification
+            </h1>
+            <p style="color: var(--muted-text); margin: 0;">Identity verification for scanned profile</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('detect') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Scan New Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if scan %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="cyber-card">
+            <h5 style="font-weight:700; margin-bottom: 20px; color: var(--heading-text);">Profile Summary</h5>
+            
+            <div class="mb-3">
+                <label style="font-weight: 600;">Username:</label>
+                <p>{{ scan.username }}</p>
+            </div>
+            
+            <div class="mb-3">
+                <label style="font-weight: 600;">Verification Status:</label>
+                <span class="badge" style="background: {% if scan.blockchain_verification.verification_status == 'Verified' %}#22c55e{% else %}#dc2626{% endif %};">
+                    {{ scan.blockchain_verification.verification_status }}
+                </span>
+            </div>
+            
+            <div class="mb-3">
+                <label style="font-weight: 600;">Trust Score:</label>
+                <h2>{{ scan.blockchain_verification.trust_score }}%</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="cyber-card">
+            <h5 style="font-weight:700; margin-bottom: 20px; color: var(--heading-text);">Verification Details</h5>
+            
+            <div class="mb-4">
+                <h6 style="font-weight:700; margin-bottom:10px;">Digital Identity Hash</h6>
+                <p style="font-family: monospace; font-size: 0.9rem; word-break: break-all;">
+                    {{ scan.blockchain_verification.digital_identity_hash if scan.blockchain_verification.digital_identity_hash else 'N/A' }}
+                </p>
+            </div>
+            
+            <div class="mb-4">
+                <h6 style="font-weight:700; margin-bottom:10px;">Verification Badge</h6>
+                {% if scan.blockchain_verification.verification_badge %}
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                <p class="text-success mt-2">Verified Badge Earned</p>
+                {% else %}
+                <i class="bi bi-x-circle text-danger" style="font-size: 3rem;"></i>
+                <p class="text-danger mt-2">Not Verified</p>
+                {% endif %}
+            </div>
+            
+            <div class="text-center">
+                <h4>{{ scan.blockchain_verification.final_result }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="cyber-card text-center py-5">
+    <i class="bi bi-search" style="font-size:5rem; color: var(--primary-blue); opacity:0.3; margin-bottom:20px;"></i>
+    <h5 style="color: var(--muted-text);">No profile scanned yet</h5>
+    <p style="color: var(--muted-text);">Go to Detect Profile to scan a profile and see identity verification</p>
+    <a href="{{ url_for('detect') }}" class="btn btn-primary">
+        <i class="bi bi-search"></i> Scan Profile
+    </a>
+</div>
+{% endif %}
+{% endblock %}

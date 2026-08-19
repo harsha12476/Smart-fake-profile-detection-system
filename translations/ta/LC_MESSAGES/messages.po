@@ -1,0 +1,62 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: ta\n"
+
+msgid "Home"
+msgstr "முகப்பு"
+
+msgid "About"
+msgstr "பற்றி"
+
+msgid "Features"
+msgstr "அம்சங்கள்"
+
+msgid "How It Works"
+msgstr "இது எப்படி செயல்படுகிறது"
+
+msgid "Contact"
+msgstr "தொடர்பு"
+
+msgid "Login"
+msgstr "உள்நுழைக"
+
+msgid "Register"
+msgstr "பதிவு செய்யவும்"
+
+msgid "Dashboard"
+msgstr "டாஷ்போர்டு"
+
+msgid "Detect"
+msgstr "கண்டறியவும்"
+
+msgid "History"
+msgstr "வரலாறு"
+
+msgid "Behavior Analysis"
+msgstr "நடத்தை பகுப்பாய்வு"
+
+msgid "Network Analysis"
+msgstr "வலைய பகுப்பாய்வு"
+
+msgid "Chatbot"
+msgstr "அரட்டை போட்"
+
+msgid "Admin Dashboard"
+msgstr "நிர்வாகி டாஷ்போர்டு"
+
+msgid "Logout"
+msgstr "வெளியேறு"
+
+msgid "FPDS"
+msgstr "FPDS"
+
+msgid "Smart Fake Profile Detection System"
+msgstr "ஸ்மார்ட் போலி சுயவிவர கண்டறிதல் அமைப்பு"
+
+msgid "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+msgstr "&copy; 2026 ஸ்மார்ட் போலி சுயவிவர கண்டறிதல் அமைப்பு. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை."
+
+msgid "Language"
+msgstr "மொழி"

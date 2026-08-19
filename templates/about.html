@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}About - FPDS{% endblock %}
+
+{% block content %}
+    <!-- About Section -->
+    <section class="about-section">
+        <!-- Left Column -->
+        <div class="about-left">
+            <h2>About Us</h2>
+            <p>
+                Our system combines Machine Learning, Deep Learning, Natural Language Processing and Computer Vision to deliver accurate fake profile detection.
+            </p>
+            <div class="shield-container">
+                <i class="bi bi-shield-check"></i>
+            </div>
+        </div>
+
+        <!-- Center Column -->
+        <div class="about-center">
+            <h2>Why Our System?</h2>
+            <p>
+                In today's digital world, fake profiles are a major threat to social media platforms. Our AI-powered system analyzes multiple parameters to identify suspicious and fake accounts with high accuracy.
+            </p>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <i class="bi bi-code-square"></i>
+                    <span>Python</span>
+                </div>
+                <div class="tech-item">
+                    <i class="bi bi-box"></i>
+                    <span>Flask</span>
+                </div>
+                <div class="tech-item">
+                    <i class="bi bi-database"></i>
+                    <span>MongoDB</span>
+                </div>
+                <div class="tech-item">
+                    <i class="bi bi-gear"></i>
+                    <span>TensorFlow</span>
+                </div>
+                <div class="tech-item">
+                    <i class="bi bi-eye"></i>
+                    <span>OpenCV</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="about-right">
+            <div class="monitor-illustration">
+                <i class="bi bi-display"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (5 Cards) -->
+    <section class="features-grid" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="feature-card">
+            <i class="bi bi-robot"></i>
+            <h3>Machine Learning</h3>
+            <p>Smart prediction using ML models</p>
+        </div>
+        <div class="feature-card">
+            <i class="bi bi-diagram-3"></i>
+            <h3>Deep Learning</h3>
+            <p>Advanced deep neural networks</p>
+        </div>
+        <div class="feature-card">
+            <i class="bi bi-chat-text"></i>
+            <h3>NLP Processing</h3>
+            <p>Analyze bio, posts and user text</p>
+        </div>
+        <div class="feature-card">
+            <i class="bi bi-camera"></i>
+            <h3>Computer Vision</h3>
+            <p>Profile picture and image analysis</p>
+        </div>
+        <div class="feature-card">
+            <i class="bi bi-activity"></i>
+            <h3>Behavioral Analysis</h3>
+            <p>Detect unusual user behavior</p>
+        </div>
+    </section>
+
+    <!-- System Highlights -->
+    <div class="highlights-box">
+        <h3>System Highlights</h3>
+        <ul>
+            <li>High accuracy using ensemble models</li>
+            <li>Real-time detection and reporting</li>
+            <li>Secure and privacy-focused</li>
+            <li>Easy integration and scalable</li>
+        </ul>
+    </div>
+{% endblock %}

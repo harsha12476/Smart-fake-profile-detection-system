@@ -1,0 +1,357 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Geolocation Risk Dashboard{% endblock %}
+
+{% block page_title %}Geolocation Risk Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px;">Geolocation Risk Dashboard</h1>
+                <p style="color: var(--text-gray); margin: 0;">Monitor location-based threats and suspicious login activity</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border" style="color: var(--primary-blue);" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3" style="color: var(--text-gray);">Analyzing geolocation data...</p>
+    </div>
+
+    <!-- Content -->
+    <div id="contentState" class="d-none">
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-people" style="color: var(--primary-blue); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Active Users</span>
+                        </div>
+                        <h3 class="mb-0" style="font-weight: 700;">124</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-exclamation-triangle" style="color: var(--alert-red); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">High Risk Users</span>
+                        </div>
+                        <h3 class="mb-0" style="font-weight: 700;">5</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-airplane" style="color: var(--warning-color); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Impossible Travel</span>
+                        </div>
+                        <h3 class="mb-0" style="font-weight: 700;">2</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-geo-alt" style="color: #f97316; font-size: 1.5rem;"></i>
+                            <span class="text-muted small">High Risk Regions</span>
+                        </div>
+                        <h3 class="mb-0" style="font-weight: 700;">6</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-list-check" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Safe Logins</span>
+                        </div>
+                        <h3 class="mb-0" style="font-weight: 700;">117</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Analysis Section -->
+        <div class="row g-3 mb-4">
+            <!-- Risk Summary Cards -->
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-geo-alt" style="color: var(--primary-blue); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Demo Location</span>
+                        </div>
+                        <h4 id="currentLocation" class="mb-0" style="font-weight: 700;">N/A</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-exclamation-triangle" style="color: var(--alert-red); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Risk Level</span>
+                        </div>
+                        <h4 id="riskLevel" class="mb-0" style="font-weight: 700;">N/A</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-thermometer-half" style="color: var(--warning-color); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Anomaly Score</span>
+                        </div>
+                        <h4 id="anomalyScore" class="mb-0" style="font-weight: 700;">0%</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="cyber-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-flag" style="color: var(--success-color); font-size: 1.5rem;"></i>
+                            <span class="text-muted small">Final Result</span>
+                        </div>
+                        <h4 id="finalResult" class="mb-0" style="font-weight: 700;">N/A</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Analysis -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-6">
+                <div class="cyber-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Risk Report (Demo)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td style="border-color: rgba(37,99,235,0.1);"><strong>Current Location:</strong></td>
+                                    <td id="reportCurrentLocation" style="border-color: rgba(37,99,235,0.1);">N/A</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-color: rgba(37,99,235,0.1);"><strong>Previous Location:</strong></td>
+                                    <td id="reportPreviousLocation" style="border-color: rgba(37,99,235,0.1);">N/A</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-color: rgba(37,99,235,0.1);"><strong>Distance:</strong></td>
+                                    <td id="reportDistance" style="border-color: rgba(37,99,235,0.1);">N/A</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-color: rgba(37,99,235,0.1);"><strong>Travel Time:</strong></td>
+                                    <td id="reportTravelTime" style="border-color: rgba(37,99,235,0.1);">N/A</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h6 class="mt-4 mb-3"><i class="bi bi-list-check"></i> Risk Analysis</h6>
+                        <ul id="riskAnalysisList" class="list-unstyled">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="cyber-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-check"></i> Risk Indicators</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i id="multipleLocationsIcon" class="bi bi-x-circle" style="font-size: 1.5rem; color: var(--text-gray);"></i>
+                                    <span id="multipleLocationsText">Multiple Location Logins</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i id="impossibleTravelIcon" class="bi bi-x-circle" style="font-size: 1.5rem; color: var(--text-gray);"></i>
+                                    <span id="impossibleTravelText">Impossible Travel</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i id="highRiskRegionIcon" class="bi bi-x-circle" style="font-size: 1.5rem; color: var(--text-gray);"></i>
+                                    <span id="highRiskRegionText">High Risk Region</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i id="locationAnomaliesIcon" class="bi bi-x-circle" style="font-size: 1.5rem; color: var(--text-gray);"></i>
+                                    <span id="locationAnomaliesText">Location Anomalies</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login History -->
+        <div class="row g-3">
+            <div class="col-lg-12">
+                <div class="cyber-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Login History (Demo)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="cyber-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Location</th>
+                                        <th>IP Address</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loginHistoryTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetchGeolocationData();
+    
+    document.getElementById('refreshBtn').addEventListener('click', fetchGeolocationData);
+});
+
+async function fetchGeolocationData() {
+    const loadingState = document.getElementById('loadingState');
+    const contentState = document.getElementById('contentState');
+    
+    loadingState.classList.remove('d-none');
+    contentState.classList.add('d-none');
+    
+    try {
+        const response = await fetch('/api/geolocation-analysis');
+        const data = await response.json();
+        
+        if (data.success) {
+            updateDashboard(data);
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+        loadingState.classList.add('d-none');
+        contentState.classList.remove('d-none');
+    }
+}
+
+function updateDashboard(data) {
+    // Update summary cards
+    document.getElementById('currentLocation').textContent = data.report.current_location;
+    document.getElementById('riskLevel').textContent = data.analysis.risk_level;
+    document.getElementById('riskLevel').style.color = getRiskColor(data.analysis.risk_score);
+    document.getElementById('anomalyScore').textContent = `${data.analysis.risk_score}%`;
+    document.getElementById('finalResult').textContent = data.report.final_result;
+    
+    // Update report
+    document.getElementById('reportCurrentLocation').textContent = data.report.current_location;
+    document.getElementById('reportPreviousLocation').textContent = data.report.previous_location;
+    document.getElementById('reportDistance').textContent = `${Math.round(data.report.distance)} km`;
+    document.getElementById('reportTravelTime').textContent = `${Math.round(data.report.travel_time)} minutes`;
+    
+    // Update risk analysis list
+    const riskList = document.getElementById('riskAnalysisList');
+    riskList.innerHTML = '';
+    if (data.analysis.details.length > 0) {
+        data.analysis.details.forEach(detail => {
+            const li = document.createElement('li');
+            li.className = 'mb-2';
+            li.innerHTML = `
+                <div class="d-flex gap-2">
+                    <i class="bi bi-exclamation-circle" style="color: var(--alert-red);"></i>
+                    <span>${detail}</span>
+                </div>
+            `;
+            riskList.appendChild(li);
+        });
+    } else {
+        const li = document.createElement('li');
+        li.innerHTML = '<span style="color: var(--text-gray);">No risks detected</span>';
+        riskList.appendChild(li);
+    }
+    
+    // Update risk indicators
+    updateRiskIndicator('multipleLocations', data.analysis.multiple_locations);
+    updateRiskIndicator('impossibleTravel', data.analysis.impossible_travel);
+    updateRiskIndicator('highRiskRegion', data.analysis.high_risk_region);
+    updateRiskIndicator('locationAnomalies', data.analysis.location_anomalies);
+    
+    // Update login history
+    const historyTable = document.getElementById('loginHistoryTable');
+    historyTable.innerHTML = '';
+    data.login_history.forEach(login => {
+        const row = document.createElement('tr');
+        const timestamp = new Date(login.timestamp);
+        row.innerHTML = `
+            <td style="font-weight: 600;">${login.city}, ${login.country}</td>
+            <td>${login.ip}</td>
+            <td>${timestamp.toLocaleString()}</td>
+        `;
+        historyTable.appendChild(row);
+    });
+}
+
+function updateRiskIndicator(id, isActive) {
+    const icon = document.getElementById(`${id}Icon`);
+    const text = document.getElementById(`${id}Text`);
+    
+    if (isActive) {
+        icon.classList.remove('bi-x-circle');
+        icon.classList.add('bi-check-circle-fill');
+        icon.style.color = 'var(--alert-red)';
+        text.style.color = 'var(--text-white)';
+        text.style.fontWeight = '600';
+    } else {
+        icon.classList.remove('bi-check-circle-fill');
+        icon.classList.add('bi-x-circle');
+        icon.style.color = 'var(--text-gray)';
+        text.style.color = 'var(--text-gray)';
+        text.style.fontWeight = '400';
+    }
+}
+
+function getRiskColor(score) {
+    if (score <= 20) return 'var(--success-color)';
+    if (score <= 40) return 'var(--primary-blue)';
+    if (score <= 60) return 'var(--warning-color)';
+    if (score <= 80) return '#f97316';
+    return 'var(--alert-red)';
+}
+</script>
+{% endblock %}

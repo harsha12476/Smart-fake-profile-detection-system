@@ -1,0 +1,26 @@
+.fpd-badge {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fpd-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.fpd-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

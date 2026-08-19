@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} - Fake Profile Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background: linear-gradient(180deg, #1a2d50 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            width: 24px;
+            margin-right: 10px;
+        }
+        .main-content {
+            min-height: 100vh;
+        }
+        .stats-card {
+            transition: transform 0.3s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 p-0 sidebar">
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold mb-0">
+                        <i class="bi bi-shield-lock"></i> Admin Panel
+                    </h4>
+                </div>
+                <hr class="mx-3 opacity-25">
+                <nav class="nav flex-column">
+                    <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'admin_users' or request.endpoint == 'admin_add_user' or request.endpoint == 'admin_edit_user' %}active{% endif %}" href="{{ url_for('admin_users') }}">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'admin_predictions' %}active{% endif %}" href="{{ url_for('admin_predictions') }}">
+                        <i class="bi bi-clipboard-data"></i> Manage Predictions
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'admin_feedback' %}active{% endif %}" href="{{ url_for('admin_feedback') }}">
+                        <i class="bi bi-chat-dots"></i> Feedback
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'admin_behavior_logs' %}active{% endif %}" href="{{ url_for('admin_behavior_logs') }}">
+                        <i class="bi bi-activity"></i> Behavioral Logs
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'admin_admins' or request.endpoint == 'admin_add_admin' or request.endpoint == 'admin_edit_admin' %}active{% endif %}" href="{{ url_for('admin_admins') }}">
+                        <i class="bi bi-shield-check"></i> Manage Admins
+                    </a>
+                    <hr class="mx-3 opacity-25 mt-3 mb-3">
+                    <a class="nav-link" href="{{ url_for('index') }}">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                    <a class="nav-link text-danger" href="{{ url_for('admin_logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-0 main-content">
+                <!-- Top Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                    <div class="container-fluid">
+                        <span class="navbar-brand">Welcome, {{ session.admin_email }}</span>
+                        <div class="ms-auto">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="text-muted small"><i class="bi bi-person-circle"></i> {{ session.admin_email }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Page Content -->
+                <div class="p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show mb-4">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    {% block scripts %}{% endblock %}
+</body>
+</html>

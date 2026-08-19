@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Home - FPDS{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <!-- Left Hero -->
+        <div class="hero-left">
+            <h1>
+                Smart Fake<br>
+                Profile<br>
+                <span class="highlight">Detection</span><br>
+                System
+            </h1>
+            <p>
+                AI-Powered solution to detect fake and suspicious social media profiles.
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                <a href="{{ url_for('about') }}" class="btn btn-secondary">Explore</a>
+            </div>
+        </div>
+
+        <!-- Center Hero Visual -->
+        <div class="hero-center">
+            <div class="hacker-container">
+                <div class="hacker-figure">
+                    <div class="scan-bracket top-left"></div>
+                    <div class="scan-bracket top-right"></div>
+                    <div class="scan-bracket bottom-left"></div>
+                    <div class="scan-bracket bottom-right"></div>
+                    <i class="bi bi-person-badge hacker-illustration"></i>
+                </div>
+                <div class="alert-badge">
+                    <i class="bi bi-exclamation-triangle"></i> FAKE PROFILE DETECTED
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Information Panel -->
+        <div class="hero-right">
+            <div class="cyber-card">
+                <h3><i class="bi bi-info-circle" style="color: var(--neon-green);"></i> About Us</h3>
+                <p>
+                    Our system combines Machine Learning, Deep Learning, Natural Language Processing and Computer Vision to deliver accurate fake profile detection.
+                </p>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <i class="bi bi-code-square"></i>
+                        <span>Python</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="bi bi-box"></i>
+                        <span>Flask</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="bi bi-database"></i>
+                        <span>MongoDB</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="bi bi-gear"></i>
+                        <span>TensorFlow</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="bi bi-eye"></i>
+                        <span>OpenCV</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cyber-card">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>98%</h4>
+                        <p>Accuracy</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>10K+</h4>
+                        <p>Profiles Tested</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Live</h4>
+                        <p>Real-time Detection</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>✓</h4>
+                        <p>Secure & Reliable</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="bi bi-robot"></i>
+                <h3>AI Analysis</h3>
+                <p>Advanced AI models for accurate detection</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-activity"></i>
+                <h3>Behavior Check</h3>
+                <p>User behavior analysis and patterns</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-image"></i>
+                <h3>Image Recognition</h3>
+                <p>Profile picture and image analysis</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-file-earmark-text"></i>
+                <h3>Instant Report</h3>
+                <p>Get instant and detailed results</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

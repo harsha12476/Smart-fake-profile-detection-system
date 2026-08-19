@@ -1,0 +1,62 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: kn\n"
+
+msgid "Home"
+msgstr "ಮುಖಪುಟ"
+
+msgid "About"
+msgstr "ಬಗ್ಗೆ"
+
+msgid "Features"
+msgstr "ವೈಶಿಷ್ಟ್ಯಗಳು"
+
+msgid "How It Works"
+msgstr "ಇದು ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ"
+
+msgid "Contact"
+msgstr "ಸಂಪರ್ಕಿಸಿ"
+
+msgid "Login"
+msgstr "ಲಾಗಿನ್"
+
+msgid "Register"
+msgstr "ನೋಂದಾಯಿಸಿ"
+
+msgid "Dashboard"
+msgstr "ಡ್ಯಾಶ್ಬೋರ್ಡ್"
+
+msgid "Detect"
+msgstr "ಪತ್ತೆ ಮಾಡಿ"
+
+msgid "History"
+msgstr "ಇತಿಹಾಸ"
+
+msgid "Behavior Analysis"
+msgstr "ನಡವಿಕೆ ವಿಶ್ಲೇಷಣೆ"
+
+msgid "Network Analysis"
+msgstr "ನೆಟ್ವರ್ಕ್ ವಿಶ್ಲೇಷಣೆ"
+
+msgid "Chatbot"
+msgstr "ಚಾಟ್ಬಾಟ್"
+
+msgid "Admin Dashboard"
+msgstr "ಅಡ್ಮಿನ್ ಡ್ಯಾಶ್ಬೋರ್ಡ್"
+
+msgid "Logout"
+msgstr "ಲಾಗ್ಔಟ್"
+
+msgid "FPDS"
+msgstr "FPDS"
+
+msgid "Smart Fake Profile Detection System"
+msgstr "ಸ್ಮಾರ್ಟ್ ಫೇಕ್ ಪ್ರೊಫೈಲ್ ಪತ್ತೆ ಮಾಡುವ ವ್ಯವಸ್ಥೆ"
+
+msgid "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+msgstr "&copy; 2026 ಸ್ಮಾರ್ಟ್ ಫೇಕ್ ಪ್ರೊಫೈಲ್ ಪತ್ತೆ ಮಾಡುವ ವ್ಯವಸ್ಥೆ. ಎಲ್ಲಾ ಹಕ್ಕುಗಳು ರಕ್ಷಿಸಲ್ಪಟ್ಟಿವೆ."
+
+msgid "Language"
+msgstr "ಭಾಷೆ"

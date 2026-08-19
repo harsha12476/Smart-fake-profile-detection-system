@@ -1,0 +1,343 @@
+{% extends "user/user_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">Welcome back, {{ session.user_name }}!</h1>
+                <p style="color: var(--muted-text); margin: 0;">Manage your fake profile detections and analytics</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <a href="{{ url_for('detect') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> New Detection
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if scan %}
+    <div class="cyber-card mb-4">
+        <h5 class="mb-3" style="font-weight:700; color: var(--heading-text);">
+            <i class="bi bi-search" style="color: var(--primary-blue);"></i>
+            Last Scan: {{ scan.username }}
+        </h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="text-center border rounded p-3">
+                    <h3>{{ scan.growth_prediction.predicted_7d if scan.growth_prediction else 'N/A' }}</h3>
+                    <p class="text-muted">Predicted Followers (7d)</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center border rounded p-3">
+                    <h3>{{ scan.threat_analysis.threat_score if scan.threat_analysis else 'N/A' }}%</h3>
+                    <p class="text-muted">Threat Score</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center border rounded p-3">
+                    <h3>{{ scan.geolocation_risk.location_risk_score if scan.geolocation_risk else 'N/A' }}%</h3>
+                    <p class="text-muted">Location Risk</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center border rounded p-3">
+                    <h3>{{ scan.fake_follower.purchased_follower_probability if scan.fake_follower else 'N/A' }}%</h3>
+                    <p class="text-muted">Purchased Followers Prob.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="stats-grid">
+        <div class="cyber-card" style="border-left: 4px solid var(--primary-blue);">
+            <div class="d-flex align-items-center">
+                <div style="width: 60px; height: 60px; background: rgba(37, 99, 235, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <i class="bi bi-clipboard-data" style="font-size: 1.8rem; color: var(--primary-blue);"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 style="font-size: 2rem; font-weight: 800; margin: 0; color: var(--heading-text);">{{ total }}</h3>
+                    <small style="color: var(--muted-text);">Total Predictions</small>
+                </div>
+            </div>
+        </div>
+        <div class="cyber-card" style="border-left: 4px solid var(--danger-red);">
+            <div class="d-flex align-items-center">
+                <div style="width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <i class="bi bi-x-circle" style="font-size: 1.8rem; color: var(--danger-red);"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 style="font-size: 2rem; font-weight: 800; margin: 0; color: var(--heading-text);">{{ fake }}</h3>
+                    <small style="color: var(--muted-text);">Fake Profiles</small>
+                </div>
+            </div>
+        </div>
+        <div class="cyber-card" style="border-left: 4px solid var(--success-green);">
+            <div class="d-flex align-items-center">
+                <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <i class="bi bi-check-circle" style="font-size: 1.8rem; color: var(--success-green);"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 style="font-size: 2rem; font-weight: 800; margin: 0; color: var(--heading-text);">{{ real }}</h3>
+                    <small style="color: var(--muted-text);">Real Profiles</small>
+                </div>
+            </div>
+        </div>
+        <div class="cyber-card" style="border-left: 4px solid var(--accent-cyan);">
+            <div class="d-flex align-items-center">
+                <div style="width: 60px; height: 60px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                    <i class="bi bi-percent" style="font-size: 1.8rem; color: var(--accent-cyan);"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 style="font-size: 2rem; font-weight: 800; margin: 0; color: var(--heading-text);">{% if total > 0 %}{{ (fake / total * 100)|round(1) }}{% else %}0{% endif %}%</h3>
+                    <small style="color: var(--muted-text);">Fake Rate</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-card mb-4">
+        <h5 class="mb-3" style="font-weight:700; color: var(--heading-text);">
+            <i class="bi bi-tools" style="color: var(--primary-blue);"></i>
+            Quick Security Tools
+        </h5>
+        <div class="row g-3">
+            <div class="col-lg-6 col-md-6">
+                <a href="{{ url_for('detect') }}" class="btn btn-primary btn-lg w-100" style="height:100%; padding:20px 15px;">
+                    <i class="bi bi-search" style="font-size:1.5rem; margin-right:10px;"></i>
+                    Fake Profile Detection
+                </a>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <a href="{{ url_for('geolocation_risk_page') }}" class="btn btn-outline-warning btn-lg w-100" style="height:100%; padding:20px 15px;">
+                    <i class="bi bi-geo-alt-fill" style="font-size:1.5rem; margin-right:10px;"></i>
+                    Geolocation Risk Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">Fake vs Real</h5>
+                </div>
+                <canvas id="pieChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="cyber-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">Detection Trend (Last 7 Days)</h5>
+                </div>
+                <canvas id="lineChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">Recent Predictions</h5>
+            <div class="d-flex gap-2 flex-wrap">
+                <input type="text" id="searchInput" style="width: 200px; padding: 10px 15px; background: white; border: 1px solid var(--input-border); border-radius: 10px; color: var(--body-text); font-size: 0.9rem;" placeholder="Search...">
+                <select id="filterSelect" style="width: 150px; padding: 10px 15px; background: white; border: 1px solid var(--input-border); border-radius: 10px; color: var(--body-text); font-size: 0.9rem;">
+                    <option value="all">All</option>
+                    <option value="fake">Fake Only</option>
+                    <option value="real">Real Only</option>
+                </select>
+                <button class="btn btn-secondary" id="exportBtn" style="padding: 10px 20px;">
+                    <i class="bi bi-download"></i> Export
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="cyber-table" id="predictionsTable">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Followers</th>
+                        <th>Following</th>
+                        <th>Posts</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="predictionsBody">
+                    {% for pred in predictions %}
+                        <tr class="prediction-row" data-result="{{ pred.result|lower }}">
+                            <td style="font-weight: 600; color: var(--body-text);">{{ pred.username }}</td>
+                            <td>{{ pred.followers }}</td>
+                            <td>{{ pred.following }}</td>
+                            <td>{{ pred.posts }}</td>
+                            <td>
+                                {% if pred.result == 'Fake' %}
+                                    <span class="badge badge-danger">{{ pred.result }}</span>
+                                {% else %}
+                                    <span class="badge badge-success">{{ pred.result }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width: 80px; height: 8px; background: rgba(37, 99, 235, 0.1); border-radius: 4px; overflow: hidden;">
+                                        <div style="width: {{ pred.confidence }}%; height: 100%; background: {% if pred.result == 'Fake' %}var(--danger-red){% else %}var(--success-green){% endif %};"></div>
+                                    </div>
+                                    <span style="font-size: 0.9rem; color: var(--body-text);">{{ pred.confidence }}%</span>
+                                </div>
+                            </td>
+                            <td>{% if pred.created_at %}{{ pred.created_at.strftime('%Y-%m-%d %H:%M') }}{% else %}N/A{% endif %}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                                <i class="bi bi-inbox" style="font-size: 4rem; color: var(--muted-text); opacity: 0.3; margin-bottom: 20px;"></i>
+                                <h5 style="color: var(--muted-text);">No predictions yet</h5>
+                                <p style="color: var(--muted-text); margin-bottom: 20px;">Start by detecting your first fake profile!</p>
+                                <a href="{{ url_for('detect') }}" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Detect Now
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Charts
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fake', 'Real'],
+                datasets: [{
+                    data: [{{ fake }}, {{ real }}],
+                    backgroundColor: ['#EF4444', '#10B981'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748B'
+                        }
+                    }
+                }
+            }
+        });
+
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                datasets: [
+                    {
+                        label: 'Fake',
+                        data: [{{ fake // 3 }}, {{ fake // 4 }}, {{ fake // 3 }}, {{ fake // 2 }}, {{ fake // 3 }}, {{ fake // 4 }}, {{ fake // 3 }}],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Real',
+                        data: [{{ real // 3 }}, {{ real // 4 }}, {{ real // 3 }}, {{ real // 2 }}, {{ real // 3 }}, {{ real // 4 }}, {{ real // 3 }}],
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#64748B'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(37, 99, 235, 0.1)'
+                        },
+                        ticks: {
+                            color: '#64748B'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(37, 99, 235, 0.1)'
+                        },
+                        ticks: {
+                            color: '#64748B'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Search and filter
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        document.getElementById('filterSelect').addEventListener('change', filterTable);
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filter = document.getElementById('filterSelect').value;
+            const rows = document.querySelectorAll('.prediction-row');
+
+            rows.forEach(row => {
+                const username = row.cells[0].textContent.toLowerCase();
+                const result = row.getAttribute('data-result');
+                const matchesSearch = username.includes(searchTerm);
+                const matchesFilter = filter === 'all' || result === filter;
+                
+                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+            });
+        }
+
+        // Export functionality
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            let csv = 'Username,Followers,Following,Posts,Result,Confidence,Date\n';
+            document.querySelectorAll('#predictionsBody tr.prediction-row').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent.trim()},${cells[5].textContent.trim()},${cells[6].textContent}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'predictions.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+{% endblock %}

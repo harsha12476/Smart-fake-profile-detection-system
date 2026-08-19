@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Profile Detector</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="p-3" style="width: 360px;">
+    <div class="text-center mb-4">
+        <h5 class="fw-bold mb-1">
+            <i class="bi bi-shield-lock text-primary"></i> Fake Profile Detector
+        </h5>
+        <p class="text-muted small mb-0">Real-time fake profile detection</p>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold">Extension Status</span>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="toggleExtension" checked>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">
+                <i class="bi bi-sliders"></i> Detection Settings
+            </h6>
+            <div class="mb-3">
+                <label class="form-label small">Sensitivity Level</label>
+                <select class="form-select form-select-sm" id="sensitivity">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">
+                <i class="bi bi-bookmark-check"></i> Whitelisted Accounts
+            </h6>
+            <div id="whitelist" class="mb-2">
+                <p class="text-muted small mb-0">No accounts whitelisted</p>
+            </div>
+            <button class="btn btn-outline-primary btn-sm w-100" id="addWhitelist">
+                <i class="bi bi-plus"></i> Add Account
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">
+                <i class="bi bi-bar-chart"></i> Recent Detections
+            </h6>
+            <div id="recentDetections">
+                <p class="text-muted small mb-0">No recent detections</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-grid gap-2">
+        <a href="http://localhost:5000" target="_blank" class="btn btn-primary">
+            <i class="bi bi-box-arrow-up-right"></i> Open Dashboard
+        </a>
+    </div>
+
+    <div class="text-center mt-3">
+        <p class="text-muted small mb-0">
+            <i class="bi bi-shield-lock"></i> v1.0.0
+        </p>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Fake Profile Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-shield-lock"></i> Admin Panel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_users') }}">Manage Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_predictions') }}">Manage Predictions</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ session.admin_email }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h1 class="fw-bold">Admin Dashboard</h1>
+                <p class="text-muted mb-0">System overview, analytics, and management</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-lg h-100 stats-card" data-stat="users">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-primary text-white rounded-circle me-3">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="fw-bold mb-0 counter" data-target="{{ total_users }}">0</h3>
+                                <small class="text-muted">Total Users</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-lg h-100 stats-card" data-stat="predictions">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-info text-white rounded-circle me-3">
+                                <i class="bi bi-clipboard-data"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="fw-bold mb-0 counter" data-target="{{ total_predictions }}">0</h3>
+                                <small class="text-muted">Total Predictions</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-lg h-100 stats-card" data-stat="fake">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-danger text-white rounded-circle me-3">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="fw-bold mb-0 counter" data-target="{{ total_fake }}">0</h3>
+                                <small class="text-muted">Fake Profiles</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-lg h-100 stats-card" data-stat="real">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-success text-white rounded-circle me-3">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="fw-bold mb-0 counter" data-target="{{ total_real }}">0</h3>
+                                <small class="text-muted">Real Profiles</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg mb-5">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-bell"></i> Notification Settings
+                </h5>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Notification Email</label>
+                        <input type="email" class="form-control" value="admin@example.com" id="notificationEmail">
+                        <small class="text-muted">Email address to receive high-risk fake profile alerts</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Risk Threshold</label>
+                        <select class="form-select" id="notificationThreshold">
+                            <option value="70">70% - Low Threshold</option>
+                            <option value="80">80% - Medium Threshold</option>
+                            <option value="90" selected>90% - High Threshold</option>
+                            <option value="95">95% - Very High Threshold</option>
+                        </select>
+                        <small class="text-muted">Minimum confidence level to trigger email alerts</small>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-primary" id="saveNotificationSettings">
+                        <i class="bi bi-check-circle"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-lg h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Fake vs Real Distribution</h5>
+                        <canvas id="pieChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">System Overview</h5>
+                        <canvas id="barChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <h5 class="fw-bold mb-0">Recent Users</h5>
+                            <button class="btn btn-outline-primary btn-sm" id="exportUsersBtn">
+                                <i class="bi bi-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersBody">
+                                    {% for user in recent_users %}
+                                        <tr>
+                                            <td class="fw-bold">{{ user.name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted">No users yet</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <h5 class="fw-bold mb-0">Recent Predictions</h5>
+                            <div class="d-flex gap-2">
+                                <div class="input-group input-group-sm" style="width: 150px;">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="searchPredictions" placeholder="Search...">
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" id="exportPredictionsBtn">
+                                    <i class="bi bi-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Username</th>
+                                        <th>Result</th>
+                                        <th>Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="predictionsBody">
+                                    {% for pred in recent_predictions %}
+                                        <tr class="prediction-row" data-username="{{ pred.username|lower }}" data-user="{{ pred.user_name|lower }}">
+                                            <td>{{ pred.user_name }}</td>
+                                            <td class="fw-bold">{{ pred.username }}</td>
+                                            <td>
+                                                {% if pred.result == 'Fake' %}
+                                                    <span class="badge bg-danger">{{ pred.result }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">{{ pred.result }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress" style="width: 60px; height: 8px;">
+                                                        <div class="progress-bar {% if pred.result == 'Fake' %}bg-danger{% else %}bg-success{% endif %}" 
+                                                             style="width: {{ pred.confidence }}%"></div>
+                                                    </div>
+                                                    <span class="small">{{ pred.confidence }}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">No predictions yet</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Smart Fake Profile Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script>
+        // Counter animation
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 1500;
+            const step = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+
+        document.querySelectorAll('.counter').forEach(counter => {
+            animateCounter(counter);
+        });
+
+        // Charts
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fake', 'Real'],
+                datasets: [{
+                    data: [{{ total_fake }}, {{ total_real }}],
+                    backgroundColor: ['#dc3545', '#198754'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Users', 'Predictions', 'Fake', 'Real'],
+                datasets: [{
+                    label: 'Count',
+                    data: [{{ total_users }}, {{ total_predictions }}, {{ total_fake }}, {{ total_real }}],
+                    backgroundColor: ['#0d6efd', '#0dcaf0', '#dc3545', '#198754'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Search predictions
+        document.getElementById('searchPredictions').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.prediction-row').forEach(row => {
+                const username = row.getAttribute('data-username');
+                const user = row.getAttribute('data-user');
+                if (username.includes(searchTerm) || user.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Export users
+        document.getElementById('exportUsersBtn').addEventListener('click', () => {
+            let csv = 'Name,Email,Joined\n';
+            document.querySelectorAll('#usersBody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length === 3) {
+                    csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent}\n`;
+                }
+            });
+            downloadCSV(csv, 'users.csv');
+        });
+
+        // Export predictions
+        document.getElementById('exportPredictionsBtn').addEventListener('click', () => {
+            let csv = 'User,Username,Result,Confidence\n';
+            document.querySelectorAll('#predictionsBody tr.prediction-row').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent.trim()},${cells[3].textContent.trim()}\n`;
+            });
+            downloadCSV(csv, 'admin_predictions.csv');
+        });
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Save notification settings
+        document.getElementById('saveNotificationSettings').addEventListener('click', () => {
+            const email = document.getElementById('notificationEmail').value;
+            const threshold = document.getElementById('notificationThreshold').value;
+            alert(`Settings saved! Email: ${email}, Threshold: ${threshold}%`);
+        });
+    </script>
+</body>
+</html>

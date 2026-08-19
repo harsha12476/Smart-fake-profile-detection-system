@@ -1,0 +1,101 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Growth Analytics{% endblock %}
+
+{% block page_title %}Growth Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 style="font-size:2rem; font-weight:800; margin-bottom:5px; color: var(--heading-text);">Growth Analytics</h1>
+            <p style="color:var(--muted-text); margin:0;">Monitor growth trends, detect suspicious activity, and review all reports</p>
+        </div>
+    </div>
+</div>
+
+<div class="stats-grid mb-4">
+    <div class="cyber-card" style="border-left:4px solid var(--primary-blue);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px; height:60px; background:rgba(37,99,235,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                <i class="bi bi-file-text" style="font-size:1.8rem; color:var(--primary-blue);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem; font-weight:800; margin:0; color:var(--heading-text);">{{ total_reports }}</h3>
+                <small style="color:var(--muted-text);">Total Reports</small>
+            </div>
+        </div>
+    </div>
+    <div class="cyber-card" style="border-left:4px solid var(--success-green);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px; height:60px; background:rgba(34,197,94,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                <i class="bi bi-percent" style="font-size:1.8rem; color:var(--success-green);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem; font-weight:800; margin:0; color:var(--heading-text);">{{ avg_trust_score }}</h3>
+                <small style="color:var(--muted-text);">Avg Trust Score</small>
+            </div>
+        </div>
+    </div>
+    <div class="cyber-card" style="border-left:4px solid var(--danger-red);">
+        <div class="d-flex align-items-center">
+            <div style="width:60px; height:60px; background:rgba(239,68,68,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                <i class="bi bi-exclamation-triangle" style="font-size:1.8rem; color:var(--danger-red);"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h3 style="font-size:2rem; font-weight:800; margin:0; color:var(--heading-text);">{{ high_risk_reports }}</h3>
+                <small style="color:var(--muted-text);">High Risk Reports</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cyber-card">
+    <h5 style="font-weight:700; margin-bottom:20px; color:var(--heading-text);"><i class="bi bi-clock-history"></i> Recent Reports</h5>
+    <div class="table-responsive">
+        <table class="cyber-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Username</th>
+                    <th>Followers</th>
+                    <th>Trust Score</th>
+                    <th>Risk Level</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in recent_reports %}
+                    <tr>
+                        <td>{{ report.user_name }}</td>
+                        <td style="font-weight:600;">{{ report.username }}</td>
+                        <td>{{ report.current_followers }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:100px; height:10px; background:rgba(37,99,235,0.1); border-radius:5px; overflow:hidden;">
+                                    <div style="width:{{ report.growth_trust_score }}%; height:100%; background:{% if report.growth_trust_score >=90 %}#22c55e{% elif report.growth_trust_score >=70 %}#84cc16{% elif report.growth_trust_score >=50 %}#eab308{% elif report.growth_trust_score >=30 %}#f97316{% else %}#ef4444{% endif %};"></div>
+                                </div>
+                                <span style="font-weight:700;">{{ report.growth_trust_score }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {% if report.growth_risk_level == 'Safe' or report.growth_risk_level == 'Low Risk' %}badge-success{% elif report.growth_risk_level == 'Moderate Risk' %}badge-warning{% else %}badge-danger{% endif %}">
+                                {{ report.growth_risk_level }}
+                            </span>
+                        </td>
+                        <td>{% if report.generated_at and report.generated_at is not string %}{{ report.generated_at.strftime('%Y-%m-%d %H:%M') }}{% elif report.generated_at %}{{ report.generated_at }}{% else %}N/A{% endif %}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:40px;">
+                            <i class="bi bi-inbox" style="font-size:3rem; color:var(--muted-text); opacity:0.3;"></i>
+                            <p class="text-muted mt-2">No reports yet</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

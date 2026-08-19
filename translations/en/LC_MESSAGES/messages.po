@@ -1,0 +1,62 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: en\n"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "About"
+msgstr "About"
+
+msgid "Features"
+msgstr "Features"
+
+msgid "How It Works"
+msgstr "How It Works"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Detect"
+msgstr "Detect"
+
+msgid "History"
+msgstr "History"
+
+msgid "Behavior Analysis"
+msgstr "Behavior Analysis"
+
+msgid "Network Analysis"
+msgstr "Network Analysis"
+
+msgid "Chatbot"
+msgstr "Chatbot"
+
+msgid "Admin Dashboard"
+msgstr "Admin Dashboard"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "FPDS"
+msgstr "FPDS"
+
+msgid "Smart Fake Profile Detection System"
+msgstr "Smart Fake Profile Detection System"
+
+msgid "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+msgstr "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+
+msgid "Language"
+msgstr "Language"

@@ -1,0 +1,398 @@
+
+{% extends "base.html" %}
+
+{% block title %}CyberSafe Chatbot - AI Cyber Safety Assistant{% endblock %}
+
+{% block content %}
+<div class="chatbot-container">
+    <div class="chatbot-wrapper">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div class="chatbot-info">
+                <h2>CyberSafe</h2>
+                <span class="status"><i class="bi bi-circle-fill"></i> Online 24/7</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p>Hello! I'm CyberSafe, your AI-powered cyber safety assistant. 🔒</p>
+                    <p>I can help you with:</p>
+                    <ul>
+                        <li>Spotting fake social media profiles</li>
+                        <li>Identifying phishing scams</li>
+                        <li>Password security tips</li>
+                        <li>Reporting cybercrime</li>
+                        <li>And much more!</li>
+                    </ul>
+                    <p>How can I assist you today?</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickMessage('What are signs of a fake profile?')">
+                <i class="bi bi-person-x"></i> Fake Profile
+            </button>
+            <button class="quick-btn" onclick="sendQuickMessage('How to spot phishing?')">
+                <i class="bi bi-envelope-exclamation"></i> Phishing
+            </button>
+            <button class="quick-btn" onclick="sendQuickMessage('Password security tips')">
+                <i class="bi bi-shield-lock"></i> Passwords
+            </button>
+            <button class="quick-btn" onclick="sendQuickMessage('How to report cybercrime?')">
+                <i class="bi bi-telephone"></i> Report
+            </button>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="Type your message here..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="bi bi-send"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chatbot-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.chatbot-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.chatbot-avatar {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.chatbot-info h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.chatbot-info .status {
+    font-size: 12px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chatbot-info .status i {
+    color: #4ade80;
+    font-size: 10px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #f8fafc;
+}
+
+.message {
+    display: flex;
+    gap: 12px;
+    max-width: 80%;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.bot-message .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.message-content {
+    background: white;
+    padding: 15px 18px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.message-content p {
+    margin: 0 0 10px 0;
+    line-height: 1.6;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.message-content ul {
+    margin: 10px 0 10px 20px;
+}
+
+.message-content li {
+    margin-bottom: 5px;
+}
+
+.quick-actions {
+    padding: 15px 25px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.quick-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.chat-input-container {
+    padding: 20px 25px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+}
+
+.chat-input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+#chatInput {
+    flex: 1;
+    padding: 14px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 30px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#chatInput:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.send-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 10px 15px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #667eea;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-8px); }
+}
+</style>
+
+<script>
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    addMessage(message, 'user');
+    input.value = '';
+    
+    showTypingIndicator();
+    
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        removeTypingIndicator();
+        addMessage(data.response, 'bot');
+    })
+    .catch(error => {
+        removeTypingIndicator();
+        addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+    });
+}
+
+function sendQuickMessage(message) {
+    document.getElementById('chatInput').value = message;
+    sendMessage();
+}
+
+function addMessage(text, type) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}-message`;
+    
+    const avatarIcon = type === 'user' ? 'bi-person-check' : 'bi-robot';
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="bi ${avatarIcon}"></i>
+        </div>
+        <div class="message-content">
+            ${text.replace(/\n/g, '<br>')}
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chatMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typingIndicator';
+    typingDiv.className = 'message bot-message';
+    typingDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="bi bi-robot"></i>
+        </div>
+        <div class="message-content">
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    `;
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+</script>
+{% endblock %}

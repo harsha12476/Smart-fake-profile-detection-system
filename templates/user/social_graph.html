@@ -1,0 +1,319 @@
+
+{% extends "user/user_base.html" %}
+
+{% block title %}Social Graph Intelligence - FPDS{% endblock %}
+
+{% block page_title %}Social Graph Intelligence{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">
+                <i class="bi bi-share-nodes"></i> Social Graph Intelligence
+            </h1>
+            <p style="color: var(--muted-text); margin: 0;">Analyze Instagram profile relationships and detect suspicious networks</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Controls & Profile Input -->
+    <div class="col-lg-4">
+        <div class="cyber-card mb-4">
+            <h5 style="font-weight: 700; margin-bottom: 20px; color: var(--heading-text);">
+                <i class="bi bi-person-search"></i> Analyze Profile Network
+            </h5>
+            <div class="mb-3">
+                <label class="form-label">Instagram Username</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="profileUsername" 
+                           placeholder="Enter username" value="johndoe_social">
+                    <button class="btn btn-primary" id="analyzeBtn">
+                        <i class="bi bi-search"></i> Analyze
+                    </button>
+                </div>
+            </div>
+            <div id="sampleProfiles" class="mb-3">
+                <small class="text-muted">Sample profiles:</small>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeUser('johndoe_social')">johndoe_social</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeUser('bot_fake_001')">bot_fake_001</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeUser('tech_explorer')">tech_explorer</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Report Card -->
+        <div class="cyber-card" id="reportCard" style="display: none;">
+            <h5 style="font-weight: 700; margin-bottom: 20px; color: var(--heading-text);">
+                <i class="bi bi-file-earmark-text"></i> Network Report
+            </h5>
+            <div class="text-center mb-4" id="riskBadgeContainer">
+                <span id="riskScore" class="badge" style="font-size: 2.5rem; padding: 15px 30px;">0</span>
+                <div id="threatLevel" style="font-size: 1.2rem; font-weight: 700; margin-top: 10px;">Safe</div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 id="connectedCount" style="font-weight: 800; color: var(--primary-blue);">0</h4>
+                        <small class="text-muted">Connected Accounts</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 id="suspiciousCount" style="font-weight: 800; color: var(--danger-red);">0</h4>
+                        <small class="text-muted">Suspicious</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="inBotClusterAlert" style="display: none;" class="alert alert-danger mb-3">
+                <i class="bi bi-exclamation-triangle"></i> Member of a bot cluster detected!
+            </div>
+            
+            <h6 class="mt-3 mb-2" style="font-weight: 700;"><i class="bi bi-lightbulb"></i> Why this score?</h6>
+            <ul id="explanationsList" class="list-unstyled small"></ul>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-3 mt-3">
+            <div class="col-12">
+                <div class="cyber-card" style="border-left: 4px solid var(--accent-cyan);">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                            <i class="bi bi-people" style="font-size: 1.5rem; color: var(--accent-cyan);"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 id="totalProfilesStat" style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--heading-text);">0</h4>
+                            <small class="text-muted">Total Profiles in Graph</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Graph Visualization -->
+    <div class="col-lg-8">
+        <div class="cyber-card h-100" style="min-height: 500px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 style="font-weight: 700; margin: 0; color: var(--heading-text);">
+                    <i class="bi bi-diagram-3"></i> Interactive Network Graph
+                </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-secondary" id="refreshGraphBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div id="graphContainer" style="width: 100%; height: 500px; background: white; border-radius: 10px; border: 1px solid var(--border-color);"></div>
+            
+            <!-- Legend -->
+            <div class="mt-4">
+                <h6 style="font-weight: 700; margin-bottom: 15px;">
+                    <i class="bi bi-info-circle"></i> Legend
+                </h6>
+                <div class="d-flex flex-wrap gap-4">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 16px; height: 16px; background: #22c55e; border-radius: 50%; margin-right: 8px;"></div>
+                        <span>Safe</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 16px; height: 16px; background: #84cc16; border-radius: 50%; margin-right: 8px;"></div>
+                        <span>Low Risk</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 16px; height: 16px; background: #eab308; border-radius: 50%; margin-right: 8px;"></div>
+                        <span>Medium Risk</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 16px; height: 16px; background: #f97316; border-radius: 50%; margin-right: 8px;"></div>
+                        <span>High Risk</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 16px; height: 16px; background: #ef4444; border-radius: 50%; margin-right: 8px;"></div>
+                        <span>Critical Risk</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Vis.js for network graph visualization -->
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet">
+
+<script>
+let network = null;
+let nodesDataSet = null;
+let edgesDataSet = null;
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    loadGraph();
+    document.getElementById('analyzeBtn').addEventListener('click', function() {
+        const username = document.getElementById('profileUsername').value;
+        if (username) analyzeUser(username);
+    });
+    document.getElementById('refreshGraphBtn').addEventListener('click', loadGraph);
+});
+
+async function loadGraph() {
+    try {
+        const response = await fetch('/api/social-graph/data');
+        const result = await response.json();
+        
+        if (result.success) {
+            drawGraph(result.graph);
+            document.getElementById('totalProfilesStat').textContent = result.graph.nodes.length;
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function drawGraph(graphData) {
+    const container = document.getElementById('graphContainer');
+    
+    // Prepare nodes
+    const nodesArray = graphData.nodes.map(node => ({
+        id: node.id,
+        label: node.label,
+        color: node.color,
+        shape: 'dot',
+        size: Math.max(10, 20 - node.risk / 10),
+        font: { size: 14, color: '#334155' },
+        borderWidth: 2,
+        borderWidthSelected: 4
+    }));
+    
+    // Prepare edges
+    const edgesArray = graphData.edges.map(edge => ({
+        from: edge.from,
+        to: edge.to,
+        width: edge.weight,
+        color: { color: '#94a3b8', highlight: '#2563eb' },
+        smooth: { type: 'continuous' }
+    }));
+    
+    nodesDataSet = new vis.DataSet(nodesArray);
+    edgesDataSet = new vis.DataSet(edgesArray);
+    
+    const data = {
+        nodes: nodesDataSet,
+        edges: edgesDataSet
+    };
+    
+    const options = {
+        nodes: {
+            shadow: true
+        },
+        edges: {
+            shadow: true,
+            smooth: { type: 'continuous' }
+        },
+        physics: {
+            enabled: true,
+            barnesHut: {
+                gravitationalConstant: -3000,
+                centralGravity: 0.3,
+                springLength: 150,
+                springConstant: 0.04,
+                damping: 0.09
+            }
+        },
+        interaction: {
+            hover: true,
+            tooltipDelay: 300
+        }
+    };
+    
+    if (!network) {
+        network = new vis.Network(container, data, options);
+        network.on('doubleClick', function(params) {
+            if (params.nodes.length > 0) {
+                analyzeUser(params.nodes[0]);
+            }
+        });
+    } else {
+        network.setData(data);
+    }
+}
+
+async function analyzeUser(username) {
+    document.getElementById('profileUsername').value = username;
+    
+    try {
+        const response = await fetch(`/api/social-graph/analyze/${username}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            displayReport(result.report);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function displayReport(report) {
+    const reportCard = document.getElementById('reportCard');
+    reportCard.style.display = 'block';
+    
+    // Update risk score badge
+    const scoreEl = document.getElementById('riskScore');
+    scoreEl.textContent = `${report.risk_score}%`;
+    
+    // Set badge color
+    let badgeClass = 'bg-success';
+    let threatColor = '#22c55e';
+    if (report.risk_score >= 85) {
+        badgeClass = 'bg-danger';
+        threatColor = '#ef4444';
+    } else if (report.risk_score >= 70) {
+        badgeClass = 'bg-orange';
+        threatColor = '#f97316';
+    } else if (report.risk_score >= 50) {
+        badgeClass = 'bg-warning';
+        threatColor = '#eab308';
+    } else if (report.risk_score >= 30) {
+        badgeClass = 'bg-lime';
+        threatColor = '#84cc16';
+    }
+    scoreEl.style.backgroundColor = threatColor;
+    scoreEl.style.color = 'white';
+    
+    // Update threat level
+    const threatEl = document.getElementById('threatLevel');
+    threatEl.textContent = report.threat_level;
+    threatEl.style.color = threatColor;
+    
+    // Update counts
+    document.getElementById('connectedCount').textContent = report.connected_accounts;
+    document.getElementById('suspiciousCount').textContent = report.suspicious_connections;
+    
+    // Bot cluster alert
+    const botAlert = document.getElementById('inBotClusterAlert');
+    botAlert.style.display = report.in_bot_cluster ? 'block' : 'none';
+    
+    // Explanations
+    const explanationsEl = document.getElementById('explanationsList');
+    explanationsEl.innerHTML = '';
+    if (report.explanations.length > 0) {
+        report.explanations.forEach(explanation => {
+            const li = document.createElement('li');
+            li.className = 'mb-2';
+            li.innerHTML = `<i class="bi bi-dash-circle" style="color: var(--danger-red); margin-right: 8px;"></i>${explanation}`;
+            explanationsEl.appendChild(li);
+        });
+    } else {
+        const li = document.createElement('li');
+        li.innerHTML = '<i class="bi bi-check-circle" style="color: var(--success-green); margin-right: 8px;"></i>No suspicious indicators found';
+        explanationsEl.appendChild(li);
+    }
+}
+</script>
+{% endblock %}

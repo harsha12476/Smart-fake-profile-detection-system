@@ -1,0 +1,147 @@
+
+{% extends "user/user_base.html" %}
+
+{% block title %}Growth Prediction History{% endblock %}
+
+{% block page_title %}Growth Prediction History{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">Account Growth Prediction History</h1>
+            <p style="color: var(--muted-text); margin: 0;">View all your past growth analysis reports</p>
+        </div>
+        <a href="{{ url_for('growth_prediction_page') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Analysis
+        </a>
+    </div>
+</div>
+
+<div class="cyber-card mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="input-group" style="max-width: 400px;">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by username...">
+        </div>
+        <button id="exportCsvBtn" class="btn btn-success">
+            <i class="bi bi-filetype-csv"></i> Export CSV
+        </button>
+    </div>
+</div>
+
+<div class="cyber-card">
+    <div class="table-responsive">
+        <table class="cyber-table" id="historyTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Followers</th>
+                    <th>Growth Rate</th>
+                    <th>Trust Score</th>
+                    <th>Risk Score</th>
+                    <th>Prediction Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in history %}
+                <tr class="history-row" data-username="{{ report.username | lower }}">
+                    <td style="font-weight:600;">{{ report.username or 'Sample User' }}</td>
+                    <td>{{ report.current_followers }}</td>
+                    <td>
+                        {% if report.metrics and report.metrics.avg_followers_per_day is defined %}
+                            {{ "%.2f"|format(report.metrics.avg_followers_per_day) }} F/Day
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:100px; height:10px; background:rgba(37,99,235,0.1); border-radius:5px; overflow:hidden;">
+                                <div style="width: {{ report.growth_trust_score }}%; height:100%; background: 
+                                    {% if report.growth_trust_score >=90 %}#22c55e{% elif report.growth_trust_score >=70 %}#84cc16{% elif report.growth_trust_score >=50 %}#eab308{% elif report.growth_trust_score >=30 %}#f97316{% else %}#ef4444{% endif %};"></div>
+                            </div>
+                            <span style="font-weight:700;">{{ report.growth_trust_score }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge {% if report.growth_risk_level == 'Safe' or report.growth_risk_level == 'Low Risk' %}badge-success{% elif report.growth_risk_level == 'Moderate Risk' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ report.growth_risk_score }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if report.generated_at %}
+                            {% if report.generated_at is string %}
+                                {{ report.generated_at[:10] }} {{ report.generated_at[11:16] }}
+                            {% else %}
+                                {{ report.generated_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center" style="padding:60px 20px;">
+                        <i class="bi bi-inbox" style="font-size:4rem; color:var(--muted-text); opacity:0.3; margin-bottom:20px;"></i>
+                        <h5 style="color:var(--muted-text);">No growth reports yet</h5>
+                        <p style="color:var(--muted-text); margin-bottom:20px;">Start your first growth analysis!</p>
+                        <a href="{{ url_for('growth_prediction_page') }}" class="btn btn-primary">
+                            <i class="bi bi-rocket-takeoff"></i> Analyze Now
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('.history-row');
+    rows.forEach(row => {
+        const username = row.dataset.username;
+        if (username.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Export CSV functionality
+document.getElementById('exportCsvBtn').addEventListener('click', function() {
+    const rows = document.querySelectorAll('#historyTable tbody tr.history-row');
+    let csvContent = "Username,Followers,Growth Rate,Trust Score,Risk Score,Prediction Date\n";
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const rowData = [
+            cells[0].textContent,
+            cells[1].textContent,
+            cells[2].textContent,
+            cells[3].textContent.trim(),
+            cells[4].textContent.trim(),
+            cells[5].textContent
+        ];
+        csvContent += rowData.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',') + "\n";
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'growth_prediction_history.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+</script>
+{% endblock %}

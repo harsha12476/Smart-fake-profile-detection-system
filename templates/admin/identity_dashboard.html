@@ -1,0 +1,146 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Identity Verification Dashboard - FPDS{% endblock %}
+
+{% block page_title %}Identity Verification Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header mb-4">
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--heading-text);">
+            <i class="bi bi-shield-lock"></i>
+            Blockchain Identity Verification Dashboard
+        </h1>
+        <p style="color: var(--muted-text);">Monitor and manage all identity verification records</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="cyber-card p-4">
+                <i class="bi bi-people" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                <h3 style="font-weight:800; font-size:2rem;" id="totalVerified">0</h3>
+                <p style="color: var(--text-gray); margin:0;">Total Verified Users</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="cyber-card p-4">
+                <i class="bi bi-check-circle" style="font-size: 2rem; color: var(--success-color);"></i>
+                <h3 style="font-weight:800; font-size:2rem;" id="avgTrust">0%</h3>
+                <p style="color: var(--text-gray); margin:0;">Average Trust Score</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="cyber-card p-4">
+                <i class="bi bi-shield-check" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                <h3 style="font-weight:800; font-size:2rem;" id="totalTransactions">0</h3>
+                <p style="color: var(--text-gray); margin:0;">Total Transactions</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="cyber-card p-4">
+                <i class="bi bi-bar-chart" style="font-size: 2rem; color: var(--primary-blue);"></i>
+                <h3 style="font-weight:800; font-size:2rem;" id="todayVerified">0</h3>
+                <p style="color: var(--text-gray); margin:0;">Verified Today</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="cyber-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="font-weight:700;">
+                        <i class="bi bi-list-check"></i> Verification History
+                    </h5>
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="cyber-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>User Name</th>
+                                    <th>Status</th>
+                                    <th>Trust Score</th>
+                                    <th>Transaction ID</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5" style="color: var(--text-gray);">
+                                        Loading verification history...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadHistory();
+    document.getElementById('refreshBtn').addEventListener('click', loadHistory);
+});
+
+async function loadHistory() {
+    try {
+        const response = await fetch('/api/admin-identity-history');
+        const data = await response.json();
+        
+        if (data.success) {
+            renderHistory(data.history);
+            updateStats(data.history);
+        }
+    } catch (err) {
+        console.error('Error loading history:', err);
+    }
+}
+
+function renderHistory(history) {
+    const tbody = document.getElementById('historyBody');
+    if (!history || history.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5" style="color: var(--text-gray);">
+                    No verification records yet
+                </td>
+            </tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = history.map(item => `
+        <tr>
+            <td style="font-weight:700;">${item.user_id}</td>
+            <td>${item.user_name}</td>
+            <td><span class="badge" style="background: var(--success-color);">${item.status}</span></td>
+            <td style="font-weight:800;">${item.trust_score}%</td>
+            <td style="font-family:monospace; font-size:0.9rem;">${item.transaction_id.substring(0,15)}...</td>
+            <td>${item.date}</td>
+        </tr>
+    `).join('');
+}
+
+function updateStats(history) {
+    const total = history.length;
+    const avgTrust = total > 0 ? (history.reduce((sum, item) => sum + item.trust_score, 0) / total).toFixed(0) : 0;
+    const today = new Date().toLocaleDateString();
+    const todayCount = history.filter(item => item.date.includes(today)).length;
+    
+    document.getElementById('totalVerified').textContent = total;
+    document.getElementById('avgTrust').textContent = avgTrust + '%';
+    document.getElementById('totalTransactions').textContent = total;
+    document.getElementById('todayVerified').textContent = todayCount;
+}
+</script>
+{% endblock %}

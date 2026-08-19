@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works - FPDS{% endblock %}
+
+{% block content %}
+    <section style="padding: 60px 0;">
+        <div class="text-center mb-5">
+            <h1 style="font-size: 2.8rem; font-weight: 800; margin-bottom: 15px;">
+                How It <span style="color: var(--neon-green);">Works</span>
+            </h1>
+            <p style="color: var(--text-gray); font-size: 1.1rem;">Our 6-step process to detect fake profiles</p>
+        </div>
+    </section>
+
+    <div class="how-it-works-grid">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <i class="bi bi-person-plus"></i>
+            <h3>User Registration</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Create your account and get instant access to our detection system
+            </p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <i class="bi bi-collection"></i>
+            <h3>Data Collection</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Enter profile details and behavior metrics for analysis
+            </p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <i class="bi bi-person-check"></i>
+            <h3>Profile Analysis</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Analyze account age, followers, following, posts, and bio length
+            </p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <i class="bi bi-robot"></i>
+            <h3>Machine Learning Prediction</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Our Random Forest classifier processes the input data
+            </p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <i class="bi bi-speedometer2"></i>
+            <h3>Risk Scoring</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Calculate authenticity score, behavior score, and combined risk
+            </p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">6</div>
+            <i class="bi bi-file-earmark-text"></i>
+            <h3>Final Detection Report</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                Get instant results with confidence score and detailed report
+            </p>
+        </div>
+    </div>
+{% endblock %}

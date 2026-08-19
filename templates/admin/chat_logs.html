@@ -1,0 +1,58 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Chat Logs - FPDS Admin Panel{% endblock %}
+{% block page_title %}Chat Logs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-robot"></i> Chat Logs</h1>
+    <p>View all conversations between users and the CyberSafe chatbot</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3><i class="bi bi-chat-square-text"></i> Recent Chat Messages</h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if chat_logs %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>User Message</th>
+                        <th>Bot Response</th>
+                        <th>Intent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in chat_logs %}
+                    <tr>
+                        <td style="white-space: nowrap;">
+                            {% if log.timestamp %}
+                                {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ log.user_name or 'Guest' }}</td>
+                        <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis;">{{ log.user_message }}</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ log.bot_response }}</td>
+                        <td><span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">{{ log.intent }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px;">
+            <i class="bi bi-chat-square-dots" style="font-size: 64px; color: var(--muted-text); margin-bottom: 20px;"></i>
+            <h4>No chat logs yet</h4>
+            <p style="color: var(--muted-text);">Start using the chatbot to see logs here</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

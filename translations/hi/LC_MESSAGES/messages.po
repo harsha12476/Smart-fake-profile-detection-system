@@ -1,0 +1,62 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Language: hi\n"
+
+msgid "Home"
+msgstr "होम"
+
+msgid "About"
+msgstr "हमारे बारे में"
+
+msgid "Features"
+msgstr "विशेषताएँ"
+
+msgid "How It Works"
+msgstr "यह कैसे काम करता है"
+
+msgid "Contact"
+msgstr "संपर्क करें"
+
+msgid "Login"
+msgstr "लॉगिन"
+
+msgid "Register"
+msgstr "रजिस्टर करें"
+
+msgid "Dashboard"
+msgstr "डैशबोर्ड"
+
+msgid "Detect"
+msgstr "पता लगाएँ"
+
+msgid "History"
+msgstr "इतिहास"
+
+msgid "Behavior Analysis"
+msgstr "व्यवहार विश्लेषण"
+
+msgid "Network Analysis"
+msgstr "नेटवर्क विश्लेषण"
+
+msgid "Chatbot"
+msgstr "चैटबॉट"
+
+msgid "Admin Dashboard"
+msgstr "एडमिन डैशबोर्ड"
+
+msgid "Logout"
+msgstr "लॉगआउट"
+
+msgid "FPDS"
+msgstr "FPDS"
+
+msgid "Smart Fake Profile Detection System"
+msgstr "स्मार्ट फेक प्रोफाइल डिटेक्शन सिस्टम"
+
+msgid "&copy; 2026 Smart Fake Profile Detection System. All rights reserved."
+msgstr "&copy; 2026 स्मार्ट फेक प्रोफाइल डिटेक्शन सिस्टम. सर्वाधिकार सुरक्षित."
+
+msgid "Language"
+msgstr "भाषा"

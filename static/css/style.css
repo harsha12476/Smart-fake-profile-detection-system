@@ -1,0 +1,61 @@
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --icon-box-size: 48px;
+  --step-number-size: 60px;
+  --card-hover-translate: -2px;
+  --transition-duration: 0.2s;
+  --text-white-80: rgba(255, 255, 255, 0.85);
+}
+
+.hero-section {
+  background: var(--primary-gradient);
+  min-height: 80vh;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.icon-box {
+  width: var(--icon-box-size);
+  height: var(--icon-box-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.step-number {
+  width: var(--step-number-size);
+  height: var(--step-number-size);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.text-white-80 {
+  color: var(--text-white-80);
+}
+
+.card {
+  transition: transform var(--transition-duration) ease-in-out;
+  will-change: transform; /* hint for smoother animation */
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translateY(var(--card-hover-translate));
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .icon-box {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+}

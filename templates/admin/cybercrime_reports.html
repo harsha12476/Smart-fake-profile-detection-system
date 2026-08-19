@@ -1,0 +1,145 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Cybercrime Intelligence Reports{% endblock %}
+
+{% block page_title %}Cybercrime Intelligence Reports{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 5px;">Cybercrime Intelligence Reports</h1>
+                <p style="color: var(--text-gray); margin: 0;">View all cyber threat analysis reports</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin_cybercrime_intelligence') }}" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> New Analysis
+                </a>
+                <button class="btn btn-secondary" id="exportBtn">
+                    <i class="bi bi-download"></i> Export CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-card mb-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" style="width: 100%; padding: 15px; background: #0A0A0A; border: 2px solid var(--glass-border); border-radius: 12px; color: var(--text-white); font-size: 1rem; transition: all 0.3s;" placeholder="Search by username...">
+            </div>
+            <div class="col-md-3">
+                <select id="filterSelect" style="width: 100%; padding: 15px; background: #0A0A0A; border: 2px solid var(--glass-border); border-radius: 12px; color: var(--text-white); font-size: 1rem; transition: all 0.3s;">
+                    <option value="all">All Threat Levels</option>
+                    <option value="CRITICAL">CRITICAL Only</option>
+                    <option value="HIGH">HIGH & CRITICAL</option>
+                    <option value="MEDIUM">MEDIUM & Above</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-card">
+        <div class="table-responsive">
+            <table class="cyber-table" id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Threat Score</th>
+                        <th>Phishing</th>
+                        <th>Financial Scam</th>
+                        <th>Identity Theft</th>
+                        <th>Malware</th>
+                        <th>AI Confidence</th>
+                        <th>Analyzed By</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsBody">
+                    {% for report in reports %}
+                        <tr class="report-row" data-username="{{ report.username | lower }}" data-threat="{{ report.threat_level }}">
+                            <td style="font-weight: 600;">{{ report.username }}</td>
+                            <td>
+                                <span style="font-weight: 800; color: {{ report.risk_color }};">
+                                    {{ report.threat_intelligence_score }}%
+                                </span>
+                            </td>
+                            <td>{{ report.phishing_score }}%</td>
+                            <td>{{ report.financial_scam_score }}%</td>
+                            <td>{{ report.identity_theft_score }}%</td>
+                            <td>{{ report.malware_score }}%</td>
+                            <td>{{ report.ai_confidence_score }}%</td>
+                            <td>{{ report.user_name | default('Admin') }}</td>
+                            <td>
+                                {% if report.created_at %}
+                                    {{ report.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 60px 20px;">
+                                <i class="bi bi-inbox" style="font-size: 4rem; color: var(--text-gray); opacity: 0.3; margin-bottom: 20px;"></i>
+                                <h5 style="color: var(--text-gray);">No cybercrime reports yet</h5>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('searchInput').addEventListener('input', filterReports);
+document.getElementById('filterSelect').addEventListener('change', filterReports);
+
+function filterReports() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filterThreat = document.getElementById('filterSelect').value;
+    
+    document.querySelectorAll('.report-row').forEach(row => {
+        const username = row.dataset.username;
+        const threat = row.dataset.threat;
+        
+        const matchesSearch = username.includes(searchTerm);
+        
+        let matchesFilter = true;
+        if (filterThreat === 'CRITICAL') {
+            matchesFilter = threat === 'CRITICAL';
+        } else if (filterThreat === 'HIGH') {
+            matchesFilter = threat === 'HIGH' || threat === 'CRITICAL';
+        } else if (filterThreat === 'MEDIUM') {
+            matchesFilter = threat === 'MEDIUM' || threat === 'HIGH' || threat === 'CRITICAL';
+        }
+        
+        if (matchesSearch && matchesFilter) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+    let csv = 'Username,Threat Score,Phishing,Financial Scam,Identity Theft,Malware,AI Confidence,Analyzed By,Created At\n';
+    document.querySelectorAll('#reportsBody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length === 9) {
+            csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent},${cells[5].textContent},${cells[6].textContent},${cells[7].textContent},${cells[8].textContent}\n`;
+        }
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cybercrime_reports.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+});
+</script>
+{% endblock %}

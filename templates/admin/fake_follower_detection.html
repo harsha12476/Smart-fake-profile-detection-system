@@ -1,0 +1,224 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Fake Follower Marketplace Detection - Admin{% endblock %}
+
+{% block page_title %}Fake Follower Marketplace Detection{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="text-center mb-5">
+            <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; color: var(--heading-text);">Fake Follower Marketplace Detection</h1>
+            <p style="color: var(--muted-text); font-size: 1.1rem;">Analyze Instagram profiles for purchased followers and engagement fraud</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <form id="fakeFollowerForm" class="cyber-form">
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Instagram Username</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-at" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="text" id="username" name="username" required placeholder="@username" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Followers Count</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-people" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="followers" name="followers" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Following Count</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-person-plus" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="following" name="following" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Average Likes per Post</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-heart" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="avg_likes" name="avg_likes" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Average Comments per Post</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-chat" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="avg_comments" name="avg_comments" required min="0" placeholder="0" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Account Age (Days)</label>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-calendar" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
+                                <input type="number" id="account_age_days" name="account_age_days" required min="1" placeholder="365" class="light-input" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+                            <i class="bi bi-search"></i> Analyze Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsSection" class="row justify-content-center d-none">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <h3 class="text-center mb-4" style="font-weight: 700;">Detection Results</h3>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="cyber-card" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3);">
+                            <h5 style="font-weight: 600; margin-bottom: 1rem;">Profile Overview</h5>
+                            <p><strong>Username:</strong> <span id="resUsername"></span></p>
+                            <p><strong>Followers:</strong> <span id="resFollowers"></span></p>
+                            <p><strong>Following:</strong> <span id="resFollowing"></span></p>
+                            <p><strong>Average Likes:</strong> <span id="resAvgLikes"></span></p>
+                            <p><strong>Average Comments:</strong> <span id="resAvgComments"></span></p>
+                            <p><strong>Engagement Rate:</strong> <span id="resEngagementRate"></span>%</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="cyber-card" style="border: 2px solid;" id="riskCard">
+                            <h5 style="font-weight: 600; margin-bottom: 1rem;">Overall Risk</h5>
+                            <div class="text-center">
+                                <h1 id="resRiskScore" style="font-size: 3rem; font-weight: 900;"></h1>
+                                <h4 id="resRiskLevel" style="font-weight: 700;"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Purchased Follower Probability</h6>
+                            <div class="text-center">
+                                <h2 id="resPurchasedProb" style="font-weight: 800; color: #ef4444;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Engagement Fraud Score</h6>
+                            <div class="text-center">
+                                <h2 id="resEngagementFraud" style="font-weight: 800; color: #f97316;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cyber-card">
+                            <h6 style="font-weight: 600; margin-bottom: 0.5rem;">Growth Manipulation Score</h6>
+                            <div class="text-center">
+                                <h2 id="resGrowthManipulation" style="font-weight: 800; color: #eab308;"></h2>
+                                <p style="color: var(--muted-text); font-size: 0.9rem;">%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-card mb-4">
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Detection Reasons</h5>
+                    <ul id="resReasons" class="list-unstyled"></ul>
+                </div>
+
+                <div class="text-center">
+                    <h4 id="resFinalResult" style="font-weight: 700;"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('fakeFollowerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Analyzing...';
+
+    try {
+        const formData = new FormData(this);
+        const response = await fetch('/api/analyze-fake-followers', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            displayResults(data.report);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error analyzing profile');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-search"></i> Analyze Profile';
+    }
+});
+
+function displayResults(report) {
+    document.getElementById('resultsSection').classList.remove('d-none');
+
+    document.getElementById('resUsername').textContent = report.username;
+    document.getElementById('resFollowers').textContent = report.followers.toLocaleString();
+    document.getElementById('resFollowing').textContent = report.following.toLocaleString();
+    document.getElementById('resAvgLikes').textContent = report.avg_likes.toLocaleString();
+    document.getElementById('resAvgComments').textContent = report.avg_comments.toLocaleString();
+    document.getElementById('resEngagementRate').textContent = report.engagement_rate;
+
+    document.getElementById('resRiskScore').textContent = report.overall_risk_score + '%';
+    document.getElementById('resRiskScore').style.color = report.risk_color;
+    document.getElementById('resRiskLevel').textContent = report.risk_level;
+    document.getElementById('riskCard').style.borderColor = report.risk_color;
+
+    document.getElementById('resPurchasedProb').textContent = report.purchased_follower_probability;
+    document.getElementById('resEngagementFraud').textContent = report.engagement_fraud_score;
+    document.getElementById('resGrowthManipulation').textContent = report.growth_manipulation_score;
+
+    const reasonsList = document.getElementById('resReasons');
+    reasonsList.innerHTML = '';
+    if (report.all_reasons.length > 0) {
+        report.all_reasons.forEach(reason => {
+            const li = document.createElement('li');
+            li.className = 'mb-2';
+            li.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-2"></i>' + reason;
+            reasonsList.appendChild(li);
+        });
+    } else {
+        const li = document.createElement('li');
+        li.innerHTML = '<i class="bi bi-check-circle text-success me-2"></i>No suspicious patterns detected';
+        reasonsList.appendChild(li);
+    }
+
+    document.getElementById('resFinalResult').textContent = report.final_result;
+    document.getElementById('resFinalResult').style.color = report.risk_color;
+
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}
+

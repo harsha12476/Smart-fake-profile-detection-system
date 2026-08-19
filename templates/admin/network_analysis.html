@@ -1,0 +1,349 @@
+
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Network Analysis - FPDS Admin{% endblock %}
+{% block page_title %}Social Network Analysis{% endblock %}
+
+{% block content %}
+<div style="max-width: 100%;">
+    <div id="errorContainer" style="display: none; margin-bottom: 25px; padding: 20px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; color: #dc2626;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h4 style="margin: 0 0 10px;"><i class="bi bi-exclamation-triangle"></i> <span id="errorTitle">Error</span></h4>
+                <p id="errorMessage" style="margin: 0 0 10px;">An error occurred</p>
+                <ul id="errorDetails" style="margin: 0; padding-left: 20px;"></ul>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn btn-primary" onclick="generateNetwork()">
+                    <i class="bi bi-arrow-clockwise"></i> Retry
+                </button>
+                <button class="btn btn-secondary" onclick="hideError()">
+                    <i class="bi bi-x-lg"></i> Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 25px;">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <h3><i class="bi bi-graph-up"></i> Network Analysis</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <label for="numNodes" style="font-size: 14px; color: #64748b;">Nodes:</label>
+                    <input type="number" id="numNodes" value="50" min="10" max="500" style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; width: 100px;">
+                </div>
+                <button class="btn btn-primary" id="generateBtn" onclick="generateNetwork()">
+                    <i class="bi bi-shuffle"></i> Generate Network
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 25px;">
+        <div class="card-header">
+            <h3><i class="bi bi-info-circle"></i> Network Statistics</h3>
+        </div>
+        <div class="card-body" id="networkStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+            <div style="text-align: center; padding: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
+                <i class="bi bi-people" style="font-size: 36px;"></i>
+                <h4 id="totalNodes" style="margin: 12px 0 5px; font-size: 32px;">-</h4>
+                <p style="opacity: 0.9; margin: 0; font-size: 14px;">Total Nodes</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); border-radius: 12px; color: white;">
+                <i class="bi bi-link-45deg" style="font-size: 36px;"></i>
+                <h4 id="totalEdges" style="margin: 12px 0 5px; font-size: 32px;">-</h4>
+                <p style="opacity: 0.9; margin: 0; font-size: 14px;">Total Edges</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; color: white;">
+                <i class="bi bi-exclamation-triangle" style="font-size: 36px;"></i>
+                <h4 id="suspiciousCount" style="margin: 12px 0 5px; font-size: 32px;">-</h4>
+                <p style="opacity: 0.9; margin: 0; font-size: 14px;">Suspicious Nodes</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; color: white;">
+                <i class="bi bi-people-fill" style="font-size: 36px;"></i>
+                <h4 id="botCommunities" style="margin: 12px 0 5px; font-size: 32px;">-</h4>
+                <p style="opacity: 0.9; margin: 0; font-size: 14px;">Bot Communities</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-bar-chart"></i> Risk Distribution</h3>
+            </div>
+            <div class="card-body" id="riskDistribution">
+                <p style="text-align: center; color: #64748b;">Generate a network to see distribution</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-people-fill"></i> Detected Communities</h3>
+            </div>
+            <div class="card-body" id="communitiesList">
+                <p style="text-align: center; color: #64748b;">Generate a network to detect communities</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 25px;">
+        <div class="card-header">
+            <h3><i class="bi bi-palette"></i> Legend</h3>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #10b981;"></div>
+                    <div>
+                        <div style="font-weight: 600;">Low Risk</div>
+                        <div style="font-size: 12px; color: #64748b;">&lt; 30%</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #f59e0b;"></div>
+                    <div>
+                        <div style="font-weight: 600;">Medium Risk</div>
+                        <div style="font-size: 12px; color: #64748b;">30-60%</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #ef4444;"></div>
+                    <div>
+                        <div style="font-weight: 600;">High Risk</div>
+                        <div style="font-size: 12px; color: #64748b;">60-80%</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #dc2626;"></div>
+                    <div>
+                        <div style="font-weight: 600;">Critical Risk</div>
+                        <div style="font-size: 12px; color: #64748b;">&gt; 80%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.risk-bar {
+    margin: 12px 0;
+}
+.risk-bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+.risk-bar-fill {
+    height: 28px;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+}
+.community-item {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 4px solid #ef4444;
+}
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+let retryCount = 0;
+const MAX_RETRIES = 3;
+
+function showError(title, message, details) {
+    const container = document.getElementById('errorContainer');
+    document.getElementById('errorTitle').textContent = title;
+    document.getElementById('errorMessage').textContent = message;
+    
+    const detailsList = document.getElementById('errorDetails');
+    detailsList.innerHTML = '';
+    if (details && details.length > 0) {
+        for (let i = 0; i < details.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = details[i];
+            detailsList.appendChild(li);
+        }
+    }
+    
+    container.style.display = 'block';
+}
+
+function hideError() {
+    document.getElementById('errorContainer').style.display = 'none';
+}
+
+function setLoadingState(isLoading) {
+    const btn = document.getElementById('generateBtn');
+    if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shuffle"></i> Generate Network';
+    }
+}
+
+async function generateNetwork() {
+    hideError();
+    setLoadingState(true);
+    
+    const numNodes = document.getElementById('numNodes').value;
+    const formData = new FormData();
+    formData.append('num_nodes', numNodes);
+    
+    try {
+        const response = await fetchWithRetry('/api/network-analysis/generate', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            showError(
+                data.error || 'Failed to generate network',
+                'Please check the details below and try again.',
+                data.details || []
+            );
+            retryCount = 0;
+            return;
+        }
+        
+        updateStats(data.summary);
+        updateRiskDistribution(data.summary.risk_distribution);
+        updateCommunities(data.summary.bot_communities);
+        retryCount = 0;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        if (retryCount >= MAX_RETRIES) {
+            showError(
+                'Network Generation Failed',
+                'Failed after ' + MAX_RETRIES + ' attempts. Please try again later.',
+                [error.message]
+            );
+            retryCount = 0;
+        }
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+async function fetchWithRetry(url, options) {
+    while (retryCount <= MAX_RETRIES) {
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) {
+                return response;
+            }
+            throw new Error('HTTP error! status: ' + response.status);
+        } catch (error) {
+            retryCount++;
+            if (retryCount > MAX_RETRIES) {
+                throw error;
+            }
+            await new Promise(function(resolve) {
+                setTimeout(resolve, 1000 * retryCount);
+            });
+        }
+    }
+}
+
+function updateStats(summary) {
+    if (!summary) return;
+    
+    document.getElementById('totalNodes').textContent = summary.total_nodes || 0;
+    document.getElementById('totalEdges').textContent = summary.total_edges || 0;
+    document.getElementById('suspiciousCount').textContent = summary.suspicious_count || 0;
+    document.getElementById('botCommunities').textContent = summary.num_bot_communities || 0;
+}
+
+function updateRiskDistribution(distribution) {
+    if (!distribution) return;
+    
+    const total = (distribution.low || 0) + (distribution.medium || 0) + 
+                  (distribution.high || 0) + (distribution.critical || 0);
+    
+    if (total === 0) {
+        document.getElementById('riskDistribution').innerHTML = 
+            '<p style="text-align: center; color: #64748b;">No data available</p>';
+        return;
+    }
+    
+    const container = document.getElementById('riskDistribution');
+    let html = '';
+    
+    html += '<div class="risk-bar">';
+    html += '<div class="risk-bar-label">';
+    html += '<span><strong>Low Risk</strong></span>';
+    html += '<span>' + (distribution.low || 0) + ' (' + Math.round((distribution.low || 0)/total*100) + '%)</span>';
+    html += '</div>';
+    html += '<div class="risk-bar-fill" style="width: ' + ((distribution.low || 0)/total*100) + '%; background: #10b981;"></div>';
+    html += '</div>';
+    
+    html += '<div class="risk-bar">';
+    html += '<div class="risk-bar-label">';
+    html += '<span><strong>Medium Risk</strong></span>';
+    html += '<span>' + (distribution.medium || 0) + ' (' + Math.round((distribution.medium || 0)/total*100) + '%)</span>';
+    html += '</div>';
+    html += '<div class="risk-bar-fill" style="width: ' + ((distribution.medium || 0)/total*100) + '%; background: #f59e0b;"></div>';
+    html += '</div>';
+    
+    html += '<div class="risk-bar">';
+    html += '<div class="risk-bar-label">';
+    html += '<span><strong>High Risk</strong></span>';
+    html += '<span>' + (distribution.high || 0) + ' (' + Math.round((distribution.high || 0)/total*100) + '%)</span>';
+    html += '</div>';
+    html += '<div class="risk-bar-fill" style="width: ' + ((distribution.high || 0)/total*100) + '%; background: #ef4444;"></div>';
+    html += '</div>';
+    
+    html += '<div class="risk-bar">';
+    html += '<div class="risk-bar-label">';
+    html += '<span><strong>Critical Risk</strong></span>';
+    html += '<span>' + (distribution.critical || 0) + ' (' + Math.round((distribution.critical || 0)/total*100) + '%)</span>';
+    html += '</div>';
+    html += '<div class="risk-bar-fill" style="width: ' + ((distribution.critical || 0)/total*100) + '%; background: #dc2626;"></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+function updateCommunities(communities) {
+    const container = document.getElementById('communitiesList');
+    
+    if (!communities || communities.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #64748b;">No bot communities detected</p>';
+        return;
+    }
+    
+    let html = '';
+    for (let i = 0; i < communities.length; i++) {
+        const community = communities[i];
+        html += '<div class="community-item">';
+        html += '<div style="font-weight: 700; font-size: 16px; margin-bottom: 10px;">';
+        html += '<i class="bi bi-exclamation-triangle" style="color: #ef4444;"></i>';
+        html += ' Bot Community #' + (i + 1);
+        html += '</div>';
+        html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; color: #475569;">';
+        html += '<div><strong>Size:</strong> ' + community.size + ' nodes</div>';
+        html += '<div><strong>High Risk:</strong> ' + community.high_risk_count + ' nodes</div>';
+        html += '<div><strong>Avg Risk Score:</strong> ' + Math.round(community.avg_risk_score || 0) + '%</div>';
+        html += '</div>';
+        html += '</div>';
+    }
+    container.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    generateNetwork();
+});
+</script>
+{% endblock %}

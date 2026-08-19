@@ -1,0 +1,369 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Behavioral Analytics - FPDS{% endblock %}
+
+{% block page_title %}Behavioral Analytics{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Advanced Behavioral Analytics & Suspicious Activity Monitoring</h1>
+        <p>AI-powered user behavior analysis, anomaly detection, and risk assessment</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="features-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 40px;">
+        <div class="feature-card" style="text-align: left;">
+            <i class="bi bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; color: #ffc107;"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 5px; color: #ffc107;" id="avgSuspicion">--</h3>
+            <p style="margin: 0; color: var(--text-gray);">Avg. Suspicion Score</p>
+        </div>
+        <div class="feature-card" style="text-align: left;">
+            <i class="bi bi-exclamation-octagon" style="font-size: 2rem; margin-bottom: 10px; color: var(--alert-red);"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 5px; color: var(--alert-red);" id="anomalyCount">--</h3>
+            <p style="margin: 0; color: var(--text-gray);">Anomalies Detected</p>
+        </div>
+        <div class="feature-card" style="text-align: left;">
+            <i class="bi bi-graph-up-arrow" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 5px;" id="highRiskCount">--</h3>
+            <p style="margin: 0; color: var(--text-gray);">High Risk Users</p>
+        </div>
+        <div class="feature-card" style="text-align: left;">
+            <i class="bi bi-clock-history" style="font-size: 2rem; margin-bottom: 10px; color: var(--primary-blue);"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 5px; color: var(--primary-blue);" id="monitoringTime">24h</h3>
+            <p style="margin: 0; color: var(--text-gray);">Monitoring Window</p>
+        </div>
+    </div>
+
+    <!-- Main Charts Row -->
+    <div class="row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <div class="cyber-card">
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-bar-chart-line"></i> Suspicion Score Trend</h3>
+            <canvas id="suspicionTrendChart" height="200"></canvas>
+        </div>
+        <div class="cyber-card">
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-calendar-check"></i> Login Frequency</h3>
+            <canvas id="loginFrequencyChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Second Charts Row -->
+    <div class="row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <div class="cyber-card">
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-pie-chart"></i> Activity Distribution</h3>
+            <canvas id="activityDistChart" height="200"></canvas>
+        </div>
+        <div class="cyber-card">
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-shield-exclamation"></i> Risk Levels</h3>
+            <canvas id="riskLevelChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Risk Classification Dashboard -->
+    <div class="cyber-card mb-4">
+        <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-shield-lock"></i> Risk Classification Dashboard</h3>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="p-4" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px;">
+                    <h5 style="color: #10B981; margin: 0 0 10px 0;">Low Risk</h5>
+                    <h2 style="font-size: 3rem; color: #10B981; margin: 0;">125</h2>
+                    <p style="color: var(--muted-text); margin: 10px 0 0 0;">Users</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px;">
+                    <h5 style="color: #F59E0B; margin: 0 0 10px 0;">Medium Risk</h5>
+                    <h2 style="font-size: 3rem; color: #F59E0B; margin: 0;">45</h2>
+                    <p style="color: var(--muted-text); margin: 10px 0 0 0;">Users</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px;">
+                    <h5 style="color: #EF4444; margin: 0 0 10px 0;">High Risk</h5>
+                    <h2 style="font-size: 3rem; color: #EF4444; margin: 0;">18</h2>
+                    <p style="color: var(--muted-text); margin: 10px 0 0 0;">Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Behavioral Heatmap (Simulated) -->
+    <div class="cyber-card mb-4">
+        <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-thermometer-half"></i> Behavioral Activity Heatmap</h3>
+        <div class="table-responsive">
+            <table class="table" style="border-collapse: collapse; width: 100%;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <th style="padding: 10px; color: var(--muted-text);">Hour</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Mon</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Tue</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Wed</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Thu</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Fri</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Sat</th>
+                        <th style="padding: 10px; color: var(--muted-text);">Sun</th>
+                    </tr>
+                </thead>
+                <tbody id="heatmapBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Real-Time Behavior Analysis -->
+    <div class="cyber-card">
+        <h3 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="bi bi-cpu"></i> Real-Time Behavior Analysis</h3>
+        <form id="behaviorForm" class="row g-3">
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Login Count</label>
+                <input type="number" class="light-input" id="loginCount" name="login_count" value="10">
+            </div>
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Posts Count</label>
+                <input type="number" class="light-input" id="postsCount" name="posts_count" value="50">
+            </div>
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Avg Actions/Hour</label>
+                <input type="number" class="light-input" id="actionsPerHour" name="avg_actions_per_hour" value="30">
+            </div>
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Continuous Activity (h)</label>
+                <input type="number" class="light-input" id="continuousActivity" name="continuous_activity_hours" value="8">
+            </div>
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Login Locations</label>
+                <input type="number" class="light-input" id="loginLocations" name="login_locations" value="1">
+            </div>
+            <div class="col-md-4">
+                <label style="display: block; margin-bottom: 8px; color: var(--muted-text); font-weight: 500;">Device Switches</label>
+                <input type="number" class="light-input" id="deviceSwitches" name="device_switches" value="1">
+            </div>
+            <div class="col-md-12 text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search"></i> Analyze Behavior
+                </button>
+            </div>
+        </form>
+        <div id="analysisResult" class="mt-4" style="display: none;"></div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let dashboardData;
+        let suspicionTrendChart, loginFrequencyChart, activityDistChart, riskLevelChart;
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/behavioral-dashboard');
+                dashboardData = await response.json();
+                renderCharts();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateStats() {
+            const avgSuspicion = Math.round(dashboardData.suspicion_trend.reduce((a, b) => a + b, 0) / dashboardData.suspicion_trend.length);
+            document.getElementById('avgSuspicion').textContent = avgSuspicion + '%';
+            document.getElementById('anomalyCount').textContent = Math.floor(Math.random() * 10);
+            document.getElementById('highRiskCount').textContent = Math.floor(Math.random() * 20);
+        }
+
+        function renderCharts() {
+            // Suspicion Trend Chart
+            const suspicionCtx = document.getElementById('suspicionTrendChart').getContext('2d');
+            suspicionTrendChart = new Chart(suspicionCtx, {
+                type: 'line',
+                data: {
+                    labels: dashboardData.labels,
+                    datasets: [{
+                        label: 'Suspicion Score',
+                        data: dashboardData.suspicion_trend,
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#FFFFFF' } }
+                    },
+                    scales: {
+                        y: { min: 0, max: 100, ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(57,255,20,0.1)' } },
+                        x: { ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(57,255,20,0.1)' } }
+                    }
+                }
+            });
+
+            // Login Frequency Chart
+            const loginCtx = document.getElementById('loginFrequencyChart').getContext('2d');
+            loginFrequencyChart = new Chart(loginCtx, {
+                type: 'bar',
+                data: {
+                    labels: dashboardData.labels,
+                    datasets: [{
+                        label: 'Logins',
+                        data: dashboardData.login_frequency,
+                        backgroundColor: '#39FF14',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(57,255,20,0.1)' } },
+                        x: { ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(57,255,20,0.1)' } }
+                    }
+                }
+            });
+
+            // Activity Distribution Chart
+            const activityCtx = document.getElementById('activityDistChart').getContext('2d');
+            activityDistChart = new Chart(activityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: dashboardData.activity_distribution.map(item => item.label),
+                    datasets: [{
+                        data: dashboardData.activity_distribution.map(item => item.value),
+                        backgroundColor: ['#39FF14', '#00FF66', '#0dcaf0', '#ffc107', '#FF2D2D'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#FFFFFF' } } }
+                }
+            });
+
+            // Risk Level Chart
+            const riskCtx = document.getElementById('riskLevelChart').getContext('2d');
+            riskLevelChart = new Chart(riskCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Low', 'Medium', 'High'],
+                    datasets: [{
+                        data: [Math.floor(Math.random() * 100), Math.floor(Math.random() * 60), Math.floor(Math.random() * 30)],
+                        backgroundColor: ['#39FF14', '#ffc107', '#FF2D2D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#FFFFFF' } } },
+                    scales: { r: { ticks: { color: '#FFFFFF' } } }
+                }
+            });
+        }
+
+        document.getElementById('behaviorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div> Analyzing behavior...';
+
+            try {
+                const behaviorData = {
+                    login_count: parseInt(document.getElementById('loginCount').value),
+                    posts_count: parseInt(document.getElementById('postsCount').value),
+                    avg_actions_per_hour: parseInt(document.getElementById('actionsPerHour').value),
+                    continuous_activity_hours: parseInt(document.getElementById('continuousActivity').value),
+                    login_locations: parseInt(document.getElementById('loginLocations').value),
+                    device_switches: parseInt(document.getElementById('deviceSwitches').value),
+                    follow_requests_sent: 50,
+                    likes_count: 200,
+                    comments_count: 50,
+                    shares_count: 20,
+                    messages_count: 30,
+                    avg_session_duration: 60,
+                    low_engagement_ratio: false,
+                    fixed_interval_actions: false,
+                    unusual_login_times: false,
+                    vpn_usage: false
+                };
+
+                const response = await fetch('/api/analyze-advanced-behavior', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(behaviorData)
+                });
+                const result = await response.json();
+                let html = '<div class="alert ' + (result.risk_level === 'High' ? 'alert-danger' : result.risk_level === 'Medium' ? 'alert-warning' : 'alert-success') + '">';
+                html += '<h4>Analysis Result</h4>';
+                html += '<p><strong>Bot Probability:</strong> ' + result.bot_probability + '%</p>';
+                html += '<p><strong>Suspicion Score:</strong> ' + result.suspicion_score + '%</p>';
+                html += '<p><strong>Risk Level:</strong> ' + result.risk_level + '</p>';
+                html += '<p><strong>Anomaly Score:</strong> ' + result.anomaly_score.overall_anomaly_score + '% (' + result.anomaly_score.count + ' anomalies)</p>';
+                html += '<p><strong>Predicted 24h Risk:</strong> ' + result.predicted_future_risk.next_24h_risk + '% (' + result.predicted_future_risk.risk_trend + ')</p>';
+                if (result.suspicious_flags.length > 0) {
+                    html += '<p><strong>Suspicious Flags:</strong></p><ul>';
+                    result.suspicious_flags.forEach(flag => html += '<li>• ' + flag + '</li>');
+                    html += '</ul>';
+                }
+                html += '</div>';
+                resultDiv.innerHTML = html;
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="alert alert-danger">Error analyzing behavior: ' + err.message + '</div>';
+            }
+        });
+
+        function generateHeatmap() {
+            const heatmapBody = document.getElementById('heatmapBody');
+            const hours = [
+                '00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
+                '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+                '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
+                '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+            ];
+            
+            heatmapBody.innerHTML = '';
+            
+            hours.forEach(hour => {
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid var(--border-color)';
+                
+                const hourCell = document.createElement('td');
+                hourCell.textContent = hour;
+                hourCell.style.padding = '8px';
+                hourCell.style.color = 'var(--muted-text)';
+                hourCell.style.fontWeight = '500';
+                row.appendChild(hourCell);
+                
+                for (let i = 0; i < 7; i++) {
+                    const cell = document.createElement('td');
+                    cell.style.padding = '8px';
+                    
+                    let intensity = Math.random();
+                    let bgColor;
+                    
+                    if (intensity < 0.2) {
+                        bgColor = 'rgba(16, 185, 129, 0.2)';
+                    } else if (intensity < 0.5) {
+                        bgColor = 'rgba(57, 255, 20, 0.35)';
+                    } else if (intensity < 0.75) {
+                        bgColor = 'rgba(245, 158, 11, 0.5)';
+                    } else {
+                        bgColor = 'rgba(239, 68, 68, 0.6)';
+                    }
+                    
+                    cell.style.backgroundColor = bgColor;
+                    cell.style.borderRadius = '4px';
+                    cell.style.textAlign = 'center';
+                    cell.textContent = Math.floor(intensity * 100);
+                    cell.style.color = '#fff';
+                    cell.style.fontWeight = 'bold';
+                    
+                    row.appendChild(cell);
+                }
+                
+                heatmapBody.appendChild(row);
+            });
+        }
+
+        loadDashboardData();
+        generateHeatmap();
+    </script>
+{% endblock %}
